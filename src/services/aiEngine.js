@@ -1,18 +1,19 @@
 /**
- * Motor de Inteligencia Artificial Conversacional y Semántico Dinámico
+ * Motor de Inteligencia Artificial con Razonamiento Aislado por Marca
  * Alarmas Chascomús - Líderes en Seguridad Electrónica
  * 
- * Versatilidad y Búsqueda Dinámica:
- * 1. Lee TODO el catálogo dinámico, todas las marcas cargadas (Garnet, Interbras/Interorás, Hikvision, Dahua, Paradox, etc.)
- *    y todas las URLs indexadas por el usuario.
- * 2. Si el usuario pregunta "¿Qué sistemas de alarmas tienen?", reúne y resume inteligentemente todas las soluciones
- *    de alarmas disponibles (paneles híbridos, inalámbricos, comunicadores y sirenas) mencionando las marcas oficiales.
- * 3. Búsqueda semántica y por palabras clave que nunca se queda sin respuesta si hay productos o fuentes en la base.
- * 4. Tono cálido, humano y consultivo, canalizando cotizaciones a WhatsApp.
+ * Reglas de Razonamiento Estricto:
+ * 1. Si el usuario pregunta por una marca puntual (ej: Intelbras / Interbras), la IA responde
+ *    ÚNICAMENTE con los productos de Intelbras (AMT 8000, AMT 4010, ANM 24 NET, cercos ELC 6012).
+ *    BAJO NINGUNA CIRCUNSTANCIA mezcla productos de Garnet ni de otras marcas si no se los pidieron.
+ * 2. Si el usuario pregunta por Garnet, responde ÚNICAMENTE con los modelos de Garnet (Sirena MP-1000, A2K4-NG, A2K8-NG).
+ * 3. Si preguntan en general "¿Qué sistemas de alarmas tienen?", resume de forma amplia y estructurada
+ *    los tipos de alarmas (inalámbricas, híbridas, perimetrales) citando las fábricas oficiales.
+ * 4. Tono natural, humano y consultivo, canalizando cotizaciones a WhatsApp.
  */
 
 export async function generateAIResponse({ query, catalog = [], settings = {}, faqs = [], manuals = [], chatHistory = [] }) {
-  await new Promise((resolve) => setTimeout(resolve, 350));
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
   const cleanQuery = query.toLowerCase().trim();
   const queryTokens = cleanQuery.split(/[\s,?.!¿¡]+/).filter(t => t.length > 2);
@@ -29,13 +30,14 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
 
   if (isOnlyGreeting && cleanQuery.length < 25) {
     return {
-      text: `¡Hola! ¿Cómo estás? Todo muy bien por acá. Soy el asistente virtual de **${businessName}**.\n\nEstoy para asesorarte sobre sistemas de alarmas, cámaras de seguridad, control de acceso y equipamiento homologado de nuestras marcas (Garnet, Interbras, Hikvision, Dahua). ¿Sobre qué solución te gustaría consultar hoy?`,
+      text: `¡Hola! ¿Cómo estás? Todo muy bien por acá. Soy el asesor virtual de **${businessName}**.\n\nEstoy a disposición para responderte consultas sobre sistemas de alarmas, cámaras de seguridad, cercos eléctricos y equipamiento homologado de nuestras marcas oficiales (**Intelbras, Garnet, Hikvision, Dahua**). ¿Sobre qué solución te gustaría consultar?`,
       source: "Atención al Cliente (Alarmas Chascomús)",
       isHandoffTriggered: false,
       suggestedActions: [
         { label: "🚨 ¿Qué sistemas de alarmas tienen?", query: "¿Qué sistemas de alarmas tienen?" },
-        { label: "📹 Cámaras de seguridad", query: "¿Qué cámaras de seguridad ofrecen?" },
-        { label: "💬 Hablar con un asesor en WhatsApp", action: "open_whatsapp" }
+        { label: "🛡️ Ver opciones de Intelbras", query: "¿Qué productos tienen de Intelbras?" },
+        { label: "🚨 Ver opciones de Garnet", query: "¿Qué productos tienen de Garnet?" },
+        { label: "💬 Hablar por WhatsApp", action: "open_whatsapp" }
       ]
     };
   }
@@ -50,7 +52,7 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
 
   if (isPricingQuery) {
     return {
-      text: `En **${businessName}** cada proyecto de seguridad se **evalúa y cotiza a medida** según las dimensiones de la propiedad, cantidad de zonas y tipo de sensores requeridos en Chascomús y la zona.\n\n${settings.handoffMessage || "Te invitamos a escribirnos por WhatsApp o dejarnos tus datos para que un especialista técnico te brinde un presupuesto exacto y sin compromiso."}`,
+      text: `En **${businessName}** cada proyecto de seguridad se **evalúa y cotiza a medida** según las características del inmueble, cantidad de aberturas y zonas a proteger en Chascomús y la región.\n\n${settings.handoffMessage || "Te invitamos a escribirnos por WhatsApp o dejarnos tus datos para que un especialista técnico te brinde un presupuesto exacto y sin compromiso."}`,
       source: "Política Comercial (Alarmas Chascomús)",
       isHandoffTriggered: true,
       suggestedActions: [
@@ -61,101 +63,121 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
   }
 
   // -------------------------------------------------------------
-  // 3. CONSULTA GENERAL DE SISTEMAS DE ALARMAS
-  // (ej: "¿Qué sistemas de alarmas tienen?", "alarmas disponibles", "opciones de alarma")
+  // 3. CONSULTA ESPECÍFICA POR MARCA: INTELBRAS / INTERBRAS
   // -------------------------------------------------------------
-  const isAlarmQuery = (cleanQuery.includes("alarma") || cleanQuery.includes("alarmas") || cleanQuery.includes("sistema de alarma") || cleanQuery.includes("sistemas de alarma")) &&
-                       (cleanQuery.includes("que") || cleanQuery.includes("qué") || cleanQuery.includes("tienen") || cleanQuery.includes("ofrecen") || cleanQuery.includes("opciones") || cleanQuery.includes("modelos") || cleanQuery.includes("tipos"));
+  const isIntelbras = ["intelbras", "interbras", "interorás", "interoras", "interobra", "inter-bras"].some(a => cleanQuery.includes(a));
 
-  if (isAlarmQuery) {
-    // Extraer todos los productos de alarmas, paneles, comunicadores y marcas presentes en el catálogo y fuentes
-    const alarmProducts = catalog.filter(item => 
-      item.category.toLowerCase().includes("alarma") || 
-      item.category.toLowerCase().includes("panel") || 
-      item.category.toLowerCase().includes("sirena") ||
-      item.name.toLowerCase().includes("alarma") ||
-      item.name.toLowerCase().includes("panel") ||
-      item.name.toLowerCase().includes("sirena")
+  if (isIntelbras) {
+    const intelbrasItems = catalog.filter(i => 
+      i.brand.toLowerCase().includes("intelbras") || 
+      i.brand.toLowerCase().includes("interbras") ||
+      (i.sourceUrl && i.sourceUrl.toLowerCase().includes("intelbras"))
     );
 
-    const brandsFound = [...new Set(catalog.map(item => item.brand))];
-    const brandsText = brandsFound.length > 0 ? brandsFound.join(", ") : "Garnet Technology, Interbras, Hikvision y Paradox";
+    let response = `Sí, en **${businessName}** trabajamos de forma oficial con la línea de seguridad electrónica de **Intelbras**.\n\n`;
+    response += `Disponemos de las siguientes soluciones y modelos de **Intelbras**:\n\n`;
 
-    let response = `En **${businessName}** contamos con una amplia gama de **sistemas de alarmas inteligentes y protección integral**, trabajando con marcas homologadas de fábrica (${brandsText}):\n\n`;
-    response += `Disponemos de las siguientes soluciones principales:\n\n`;
+    if (intelbrasItems.length > 0) {
+      intelbrasItems.forEach(item => {
+        response += `• **${item.name}:** ${item.description}\n`;
+      });
+    } else {
+      response += `• **Central AMT 8000 Pro:** Alarma 100% inalámbrica de largo alcance con Wi-Fi, 4G y control total por App móvil AMT Remoto.\n`;
+      response += `• **Centrales Híbridas AMT 4010 / AMT 2018 E:** Paneles modulares de hasta 64 zonas para hogares y comercios.\n`;
+      response += `• **Alarma ANM 24 NET:** Sistema no monitoreado con aviso directo a la nube y programación por smartphone.\n`;
+      response += `• **Cercos Eléctricos ELC 6012 NET (Wi-Fi):** Electrificadores perimetrales con aviso de corte al celular.\n`;
+      response += `• **Sensores Infrarrojos IVP 8000 Pet:** Detectores inalámbricos de alta precisión anti-mascotas.\n`;
+    }
 
-    response += `1. **Sistemas de Alarmas Inalámbricas y Monitoreadas:**\n   Centrales inteligentes con control total desde el celular por App móvil, aviso instantáneo de disparo, baterías de respaldo y sensores anti-mascotas.\n\n`;
-
-    response += `2. **Paneles Híbridos Modulares (4 a 32 Zonas):**\n   Líneas profesionales (como Garnet A2K4-NG, A2K8-NG y centrales Interbras) para residencias, locales comerciales e industrias.\n\n`;
-
-    response += `3. **Sirenas Perimetrales de Alta Potencia:**\n   Sirenas de exterior e interior con balizas LED estroboscópicas, 120dB y doble tamper anti-sabotaje.\n\n`;
-
-    response += `4. **Barreras y Sensores Perimetrales Exteriores:**\n   Detección infrarroja y microondas para patios, quintas y predios.\n\n`;
-
-    response += `¿Buscás proteger una casa, un comercio o un campo en Chascomús? Contame y te asesoro con la opción más adecuada.`;
+    response += `\n¿Te gustaría solicitar una cotización o asesoramiento técnico sobre algún equipo Intelbras para tu propiedad en Chascomús?`;
 
     return {
       text: response,
-      source: `Catálogo Oficial y Fábricas (${brandsText})`,
-      productsMatched: alarmProducts,
+      source: "Catálogo Oficial (Intelbras Argentina)",
+      productsMatched: intelbrasItems,
+      isHandoffTriggered: false,
+      suggestedActions: [
+        { label: "📱 Alarma Inalámbrica AMT 8000", query: "¿Qué características tiene la central Intelbras AMT 8000?" },
+        { label: "⚡ Cerco Eléctrico Intelbras ELC 6012", query: "¿Tienen cercos eléctricos Intelbras?" },
+        { label: "💬 Solicitar Cotización en WhatsApp", action: "open_whatsapp" }
+      ]
+    };
+  }
+
+  // -------------------------------------------------------------
+  // 4. CONSULTA ESPECÍFICA POR MARCA: GARNET TECHNOLOGY
+  // -------------------------------------------------------------
+  const isGarnet = ["garnet", "garnet technology", "alonso"].some(a => cleanQuery.includes(a));
+
+  if (isGarnet) {
+    const garnetItems = catalog.filter(i => i.brand.toLowerCase().includes("garnet"));
+
+    let response = `Sí, en **${businessName}** trabajamos de forma oficial con la fábrica **Garnet Technology**.\n\n`;
+    response += `Modelos y equipamiento oficial de **Garnet** disponibles:\n\n`;
+
+    if (garnetItems.length > 0) {
+      garnetItems.forEach(item => {
+        response += `• **${item.name}:** ${item.description}\n`;
+      });
+    } else {
+      response += `• **Sirena Exterior MP-1000 con Baliza LED:** 120dB de potencia, baliza estroboscópica y doble tamper anti-sabotaje.\n`;
+      response += `• **Sirena Exterior MP-200 Bitonal:** Gabinete estanco con flash LED y protección UV.\n`;
+      response += `• **Paneles de Alarma Híbridos A2K4-NG y A2K8-NG:** Centrales de 4 a 32 zonas con reporte a la App Garnet Control Pro.\n`;
+    }
+
+    response += `\n¿Te gustaría solicitar cotización de instalación de algún equipo Garnet?`;
+
+    return {
+      text: response,
+      source: "Catálogo Oficial (Garnet Technology)",
+      productsMatched: garnetItems,
+      isHandoffTriggered: false,
+      suggestedActions: [
+        { label: "🚨 Ficha Técnica Sirena MP-1000", query: "¿Cuáles son las características de la sirena MP-1000?" },
+        { label: "📱 Panel Garnet A2K4-NG", query: "¿Qué características tiene el panel Garnet A2K4?" },
+        { label: "💬 Consultar en WhatsApp", action: "open_whatsapp" }
+      ]
+    };
+  }
+
+  // -------------------------------------------------------------
+  // 5. CONSULTA GENERAL: ¿QUÉ SISTEMAS DE ALARMAS TIENEN?
+  // -------------------------------------------------------------
+  const isGeneralAlarmQuery = (cleanQuery.includes("alarma") || cleanQuery.includes("alarmas") || cleanQuery.includes("sistema de alarma") || cleanQuery.includes("sistemas de alarma")) &&
+                              (cleanQuery.includes("que") || cleanQuery.includes("qué") || cleanQuery.includes("tienen") || cleanQuery.includes("ofrecen") || cleanQuery.includes("opciones") || cleanQuery.includes("modelos") || cleanQuery.includes("tipos") || cleanQuery.includes("recomiendan"));
+
+  if (isGeneralAlarmQuery) {
+    let response = `En **${businessName}** ofrecemos soluciones integrales de alarmas adaptadas a cada necesidad, trabajando con marcas líderes homologadas (**Intelbras, Garnet, Hikvision, Paradox**):\n\n`;
+
+    response += `1. **Sistemas de Alarmas Inalámbricas Inteligentes:**\n`;
+    response += `   • Centrales como la **Intelbras AMT 8000 Pro** (100% sin cables, Wi-Fi y 4G) o **Garnet Hub** con aviso en tiempo real a tu celular por App móvil.\n\n`;
+
+    response += `2. **Paneles Híbridos Modulares (Cableados e Inalámbricos):**\n`;
+    response += `   • Centrales de 4 a 64 zonas (como **Garnet A2K4-NG / A2K8-NG** o **Intelbras AMT 4010 Smart**) ideales para casas grandes, comercios e industrias.\n\n`;
+
+    response += `3. **Sistemas de Cerco Eléctrico y Protección Perimetral:**\n`;
+    response += `   • Electrificadores inteligentes con Wi-Fi (**Intelbras ELC 6012 NET**) y barreras infrarrojas para protección de patios, quintas y predios.\n\n`;
+
+    response += `4. **Sirenas Perimetrales de Alta Potencia:**\n`;
+    response += `   • Modelos piezoeléctricos de 120dB con balizas LED estroboscópicas y doble tamper anti-desmonte.\n\n`;
+
+    response += `¿Buscás proteger una casa, un comercio o una quinta en Chascomús? Contame y te asesoro con la opción exacta.`;
+
+    return {
+      text: response,
+      source: "Catálogo General (Alarmas Chascomús)",
       isHandoffTriggered: false,
       suggestedActions: [
         { label: "🏠 Alarma para Hogar", query: "¿Qué alarma me recomiendan para una casa?" },
         { label: "🏢 Alarma para Comercio", query: "¿Qué opciones tienen para un comercio?" },
-        { label: "💬 Solicitar Cotización por WhatsApp", action: "open_whatsapp" }
+        { label: "⚡ Cercos Eléctricos", query: "¿Tienen cercos eléctricos perimetrales?" },
+        { label: "💬 Hablar con un Asesor", action: "open_whatsapp" }
       ]
     };
   }
 
   // -------------------------------------------------------------
-  // 4. CONSULTA POR UNA MARCA ESPECÍFICA (ej: Interbras, Interorás, Garnet, Hikvision, Dahua)
-  // -------------------------------------------------------------
-  const brandKeywords = [
-    { key: "interbras", alias: ["interbras", "interorás", "interoras", "interobra", "inter-bras"] },
-    { key: "garnet", alias: ["garnet", "garnet technology", "alonso"] },
-    { key: "hikvision", alias: ["hikvision", "hik vision", "colorvu"] },
-    { key: "dahua", alias: ["dahua"] },
-    { key: "paradox", alias: ["paradox"] },
-    { key: "zkteco", alias: ["zkteco", "zk"] }
-  ];
-
-  let detectedBrandObj = brandKeywords.find(b => b.alias.some(a => cleanQuery.includes(a)));
-
-  if (detectedBrandObj) {
-    const brandName = detectedBrandObj.key.charAt(0).toUpperCase() + detectedBrandObj.key.slice(1);
-    
-    // Buscar productos de esa marca en el catálogo dinámico
-    const brandProducts = catalog.filter(item => 
-      item.brand.toLowerCase().includes(detectedBrandObj.key) ||
-      detectedBrandObj.alias.some(a => item.brand.toLowerCase().includes(a) || item.name.toLowerCase().includes(a) || (item.sourceUrl && item.sourceUrl.toLowerCase().includes(a)))
-    );
-
-    let response = `Sí, en **${businessName}** trabajamos con la línea oficial y equipamiento de la fábrica **${brandName}** (contamos con su información y fichas técnicas indexadas).\n\n`;
-
-    if (brandProducts.length > 0) {
-      response += `Equipos y soluciones disponibles de **${brandName}**:\n`;
-      brandProducts.forEach(prod => {
-        response += `• **${prod.name}:** ${prod.description}\n`;
-      });
-      response += `\n¿Te gustaría conocer especificaciones técnicas detalladas o solicitar una cotización de instalación para ${brandName}?`;
-    } else {
-      response += `Disponemos de sus sistemas de alarmas, sensores y accesorios homologados con respaldo técnico oficial e instalación profesional en Chascomús y la región.\n\n¿Sobre qué producto o requerimiento de ${brandName} te gustaría consultar?`;
-    }
-
-    return {
-      text: response,
-      source: `Fábrica Homologada (${brandName})`,
-      productsMatched: brandProducts,
-      isHandoffTriggered: false,
-      suggestedActions: [
-        { label: `🚨 Consultar modelos de ${brandName}`, query: `¿Qué modelos de ${brandName} tienen?` },
-        { label: "💬 Solicitar Asesoramiento en WhatsApp", action: "open_whatsapp" }
-      ]
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 5. CARACTERÍSTICAS / FICHAS TÉCNICAS ESPECÍFICAS (ej: MP-1000, A2K4, IP-500)
+  // 6. CARACTERÍSTICAS / FICHAS TÉCNICAS PUNTUALES (ej: MP-1000, AMT 8000, ELC 6012)
   // -------------------------------------------------------------
   const isSpecsQuery = cleanQuery.includes("caracteristica") || 
                        cleanQuery.includes("características") || 
@@ -165,19 +187,24 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
                        cleanQuery.includes("ficha técnica") || 
                        cleanQuery.includes("mp-1000") || 
                        cleanQuery.includes("mp1000") ||
-                       cleanQuery.includes("mp-100");
+                       cleanQuery.includes("amt 8000") ||
+                       cleanQuery.includes("amt8000") ||
+                       cleanQuery.includes("elc 6012") ||
+                       cleanQuery.includes("a2k4");
 
   if (isSpecsQuery) {
     const matchedItem = catalog.find(item => 
       item.name.toLowerCase().includes("mp-1000") || 
-      item.name.toLowerCase().includes("mp-100") ||
+      item.name.toLowerCase().includes("amt 8000") || 
+      item.name.toLowerCase().includes("elc 6012") || 
+      item.name.toLowerCase().includes("a2k4") || 
       queryTokens.some(t => item.name.toLowerCase().includes(t))
     );
 
     if (matchedItem) {
-      let responseText = `Con gusto. Las **especificaciones técnicas oficiales** de la **${matchedItem.name}** (${matchedItem.brand}) son:\n\n`;
+      let responseText = `Las **especificaciones técnicas oficiales** de **${matchedItem.name}** (${matchedItem.brand}) son:\n\n`;
       responseText += `• *Descripción:* ${matchedItem.description}\n\n`;
-      responseText += `**Prestaciones y Ficha Técnica:**\n`;
+      responseText += `**Prestaciones principales:**\n`;
 
       if (matchedItem.specs && matchedItem.specs.length > 0) {
         matchedItem.specs.forEach(spec => {
@@ -185,23 +212,23 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
         });
       }
 
-      responseText += `\n¿Te gustaría coordinar la instalación o solicitar presupuesto para tu propiedad en Chascomús?`;
+      responseText += `\n¿Te gustaría coordinar una visita técnica o solicitar presupuesto para tu propiedad en Chascomús?`;
 
       return {
         text: responseText,
-        source: `Ficha Técnica Oficial (${matchedItem.brand})`,
+        source: `Ficha Técnica (${matchedItem.brand})`,
         productsMatched: [matchedItem],
         isHandoffTriggered: false,
         suggestedActions: [
           { label: "📋 Cotizar este equipo", action: "open_form" },
-          { label: "💬 Consultar por WhatsApp", action: "open_whatsapp" }
+          { label: "💬 Consultar en WhatsApp", action: "open_whatsapp" }
         ]
       };
     }
   }
 
   // -------------------------------------------------------------
-  // 6. FAQS CON VIDEO O RESOLUCIÓN DE FALLAS
+  // 7. FAQS CON VIDEO O RESOLUCIÓN DE PROBLEMAS
   // -------------------------------------------------------------
   const matchedFaq = faqs.find(faq => {
     const qText = faq.question.toLowerCase();
@@ -231,7 +258,7 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
   }
 
   // -------------------------------------------------------------
-  // 7. BÚSQUEDA SEMÁNTICA DINÁMICA EN EL CATÁLOGO (Cualquier coincidencia de palabras)
+  // 8. BÚSQUEDA SEMÁNTICA DINÁMICA POR PALABRAS CLAVE
   // -------------------------------------------------------------
   const semanticMatches = catalog.filter((item) => {
     const name = item.name.toLowerCase();
@@ -251,7 +278,7 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
       response += `• **${item.name}** (${item.brand})\n  ${item.description}\n\n`;
     });
 
-    response += `Cada instalación se planifica de forma personalizada para tu propiedad. ¿Te gustaría que un especialista técnico te asesore sin compromiso?`;
+    response += `Cada instalación se planifica de forma personalizada. ¿Te gustaría que un especialista técnico te asesore sin compromiso?`;
 
     return {
       text: response,
@@ -266,10 +293,10 @@ export async function generateAIResponse({ query, catalog = [], settings = {}, f
   }
 
   // -------------------------------------------------------------
-  // 8. RESPUESTA VERSÁTIL Y HUMANA POR DEFECTO
+  // 9. RESPUESTA GENERAL Y ATENCIÓN CONSULTIVA
   // -------------------------------------------------------------
   return {
-    text: `¡Hola! Como asesor virtual de **${businessName}**, estoy capacitado para ayudarte con todos nuestros sistemas de seguridad electrónica en Chascomús y la región.\n\nContamos con equipamiento oficial homologado en:\n• **Sistemas de Alarmas Inteligentes** (Garnet, Interbras, Paradox)\n• **Cámaras de Videovigilancia IP 4K** (Hikvision, Dahua)\n• **Protección Perimetral y Sensores Exteriores**\n• **Control de Acceso Biométrico y Digital**\n\n¿Sobre cuál de estas áreas te gustaría recibir más información?`,
+    text: `Como asesor virtual de **${businessName}**, estoy capacitado para informarte sobre todas nuestras soluciones de seguridad electrónica en Chascomús y la región.\n\nTrabajamos con equipamiento oficial en:\n• **Sistemas de Alarmas Inalámbricas e Híbridas** (Intelbras, Garnet)\n• **Cámaras de Videovigilancia IP 4K** (Hikvision, Dahua)\n• **Cercos Eléctricos y Protección Perimetral** (Intelbras ELC)\n• **Control de Acceso y Sensores Infrarrojos**\n\n¿Sobre cuál de estos sistemas te gustaría recibir asesoramiento?`,
     source: "Atención Consultiva (Alarmas Chascomús)",
     isHandoffTriggered: false,
     suggestedActions: [
