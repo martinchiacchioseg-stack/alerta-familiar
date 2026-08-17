@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
@@ -12,15 +12,81 @@ import Footer from './components/Footer';
 import { INITIAL_CATALOG, INITIAL_SETTINGS, INITIAL_FAQS, INITIAL_MANUALS } from './data/defaultCatalog';
 
 export default function App() {
-  const [viewMode, setViewMode] = useState('client'); // 'client' | 'admin'
-  const [catalog, setCatalog] = useState(INITIAL_CATALOG);
-  const [settings, setSettings] = useState(INITIAL_SETTINGS);
-  const [faqs, setFaqs] = useState(INITIAL_FAQS);
-  const [manuals, setManuals] = useState(INITIAL_MANUALS);
+  const [viewMode, setViewMode] = useState('home'); // 'home' | 'products' | 'admin'
+
+  // Persistencia Automática en LocalStorage del Navegador
+  const [catalog, setCatalog] = useState(() => {
+    try {
+      const saved = localStorage.getItem('achas_catalog');
+      return saved ? JSON.parse(saved) : INITIAL_CATALOG;
+    } catch {
+      return INITIAL_CATALOG;
+    }
+  });
+
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('achas_settings');
+      return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
+    } catch {
+      return INITIAL_SETTINGS;
+    }
+  });
+
+  const [faqs, setFaqs] = useState(() => {
+    try {
+      const saved = localStorage.getItem('achas_faqs');
+      return saved ? JSON.parse(saved) : INITIAL_FAQS;
+    } catch {
+      return INITIAL_FAQS;
+    }
+  });
+
+  const [manuals, setManuals] = useState(() => {
+    try {
+      const saved = localStorage.getItem('achas_manuals');
+      return saved ? JSON.parse(saved) : INITIAL_MANUALS;
+    } catch {
+      return INITIAL_MANUALS;
+    }
+  });
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState(false);
+
+  // Guardar automáticamente en LocalStorage cada vez que cambien los datos
+  useEffect(() => {
+    try {
+      localStorage.setItem('achas_catalog', JSON.stringify(catalog));
+    } catch (e) {
+      console.error("Error guardando catálogo", e);
+    }
+  }, [catalog]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('achas_settings', JSON.stringify(settings));
+    } catch (e) {
+      console.error("Error guardando ajustes", e);
+    }
+  }, [settings]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('achas_faqs', JSON.stringify(faqs));
+    } catch (e) {
+      console.error("Error guardando faqs", e);
+    }
+  }, [faqs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('achas_manuals', JSON.stringify(manuals));
+    } catch (e) {
+      console.error("Error guardando manuales", e);
+    }
+  }, [manuals]);
 
   const handleAskProduct = (productName) => {
     setIsChatOpen(true);
@@ -35,26 +101,32 @@ export default function App() {
     <div className="app-root" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header 
         settings={settings}
-        catalogCount={catalog.length}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       <main className="main-container" style={{ flex: 1 }}>
-        {viewMode === 'client' ? (
+        {viewMode === 'home' && (
           <>
             <HeroSection 
               onOpenChat={() => setIsChatOpen(true)}
               settings={settings}
+              onNavigateProducts={() => setViewMode('products')}
             />
-            <AboutSection 
-              settings={settings}
-            />
+            <AboutSection settings={settings} />
             <ServicesSection />
-            <CatalogSection 
-              catalog={catalog}
-              onAskProduct={handleAskProduct}
-            />
           </>
-        ) : (
+        )}
+
+        {viewMode === 'products' && (
+          <CatalogSection 
+            catalog={catalog}
+            onAskProduct={handleAskProduct}
+            onBackHome={() => setViewMode('home')}
+          />
+        )}
+
+        {viewMode === 'admin' && (
           <AdminPanel 
             catalog={catalog}
             setCatalog={setCatalog}
@@ -64,6 +136,7 @@ export default function App() {
             setFaqs={setFaqs}
             manuals={manuals}
             setManuals={setManuals}
+            onExit={() => setViewMode('home')}
           />
         )}
       </main>
@@ -76,7 +149,7 @@ export default function App() {
         setViewMode={setViewMode}
       />
 
-      {/* Floating Chat Engine Widget con soporte de FAQs, Videos y Manuales */}
+      {/* Floating Chat Engine Widget */}
       <ChatWidget 
         isOpen={isChatOpen}
         setIsOpen={setIsChatOpen}
@@ -94,7 +167,7 @@ export default function App() {
         settings={settings}
       />
 
-      {/* Modal de Autenticación de Administrador con clave editable */}
+      {/* Modal de Autenticación de Administrador */}
       <AdminAuthModal 
         isOpen={isAdminAuthOpen}
         onClose={() => setIsAdminAuthOpen(false)}

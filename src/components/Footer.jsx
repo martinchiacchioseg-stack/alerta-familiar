@@ -1,31 +1,33 @@
 import React from 'react';
-import { Lock, Shield } from 'lucide-react';
+import { Lock, ArrowLeft } from 'lucide-react';
 
 export default function Footer({ onOpenAdminAuth, settings, viewMode, setViewMode }) {
   return (
     <footer className="app-footer">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Shield size={18} color="var(--brand-crimson)" />
-        <span style={{ fontWeight: '700', fontFamily: 'var(--font-serif)', color: 'var(--text-main)' }}>
-          {settings.businessName}
-        </span>
-        <span>© {new Date().getFullYear()} — Seguridad Electrónica & Monitoreo</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+        <p style={{ fontWeight: '800', color: '#ffffff', letterSpacing: '0.02em', fontSize: '0.95rem' }}>
+          ALARMAS CHASCOMÚS · LÍDERES EN SEGURIDAD ELECTRÓNICA
+        </p>
+        <p style={{ color: 'var(--text-dim)', fontSize: '0.78rem' }}>
+          Chascomús y Zona de Influencia · Asesoramiento e Instalaciones a Medida
+        </p>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         {viewMode === 'admin' ? (
           <button 
             className="hidden-admin-btn"
-            onClick={() => setViewMode('client')}
-            style={{ color: '#f87171' }}
+            onClick={() => setViewMode('home')}
+            style={{ color: '#ef4444' }}
           >
-            <span>← Salir de Modo Administración</span>
+            <ArrowLeft size={13} />
+            <span>Salir del Modo Administración</span>
           </button>
         ) : (
           <button 
             className="hidden-admin-btn"
             onClick={onOpenAdminAuth}
-            title="Acceso restringido para el administrador del sitio"
+            title="Acceso exclusivo para el administrador"
           >
             <Lock size={12} />
             <span>Acceso Administración IA</span>
