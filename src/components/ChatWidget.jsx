@@ -7,13 +7,13 @@ export default function ChatWidget({ isOpen, setIsOpen, catalog, settings, faqs,
     {
       id: 1,
       sender: 'bot',
-      text: `¡Hola! Soy el asistente virtual especializado en Seguridad Electrónica de **${settings.businessName}**.\n\nPuedo responderte consultas sobre equipos de fábrica (Garnet, Hikvision, Dahua), manuales PDF, problemas frecuentes o cotización de instalaciones. ¿En qué puedo ayudarte?`,
-      source: `Catálogo Oficial & Sistema Grounded`,
+      text: `¡Hola! Soy el asistente virtual de **${settings.businessName}**.\n\nPuedo responderte consultas sobre equipos de seguridad (Garnet, Hikvision, Dahua), manuales de usuario, resolución de fallas o coordinar una visita técnica. ¿En qué te puedo ayudar?`,
+      source: `Asesor Técnico Oficial`,
       suggestedActions: [
-        { label: "🚨 ¿Tienen sirenas Garnet?", query: "¿Tienen sirenas Garnet?" },
+        { label: "🚨 Sirena Garnet MP-1000", query: "¿Cuáles son las características de la sirena MP-1000?" },
+        { label: "📱 Paneles de Alarma Garnet", query: "¿Qué paneles de alarma Garnet tienen?" },
         { label: "📹 Cámaras IP 4K ColorVu", query: "¿Qué cámaras de seguridad ofrecen?" },
-        { label: "❓ ¿Por qué mi alarma pita?", query: "¿Por qué mi teclado de alarma hace un sonido/beep?" },
-        { label: "📄 Manuales de Alarma PDF", query: "Necesito el manual de la alarma Garnet" }
+        { label: "❓ ¿Por qué mi teclado pita?", query: "¿Por qué mi teclado de alarma hace un sonido/beep?" }
       ]
     }
   ]);
@@ -100,98 +100,106 @@ export default function ChatWidget({ isOpen, setIsOpen, catalog, settings, faqs,
   };
 
   return (
-    <div className="chat-drawer">
+    <>
+      {/* Botón flotante FAB en la esquina */}
       {!isOpen && (
-        <button className="chat-toggle-fab" onClick={() => setIsOpen(true)} title="Abrir Asistente IA">
-          <MessageSquare size={24} />
-        </button>
+        <div className="chat-drawer">
+          <button className="chat-toggle-fab" onClick={() => setIsOpen(true)} title="Consultar al Asistente IA">
+            <MessageSquare size={24} />
+          </button>
+        </div>
       )}
 
+      {/* Modal Push-Up Centrado en Pantalla con Fondo Oscuro (Backdrop) */}
       {isOpen && (
-        <div className="chat-window">
-          {/* Header del Chat */}
-          <div className="chat-window-header">
-            <div className="chat-avatar-info">
-              <div className="chat-avatar-icon">
-                <Bot size={18} />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: 'white', lineHeight: '1.2', fontFamily: 'var(--font-serif)' }}>
-                  Asistente {settings.businessName}
-                </h4>
-                <div style={{ fontSize: '0.68rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span className="badge-pulse-dot" style={{ width: '5px', height: '5px' }}></span>
-                  <span>Catálogo & FAQs con Video</span>
+        <div className="chat-modal-overlay" onClick={() => setIsOpen(false)}>
+          <div className="chat-window-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Header del Chat */}
+            <div className="chat-window-header">
+              <div className="chat-avatar-info">
+                <div className="chat-avatar-icon">
+                  <Bot size={20} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'white', lineHeight: '1.2', fontFamily: 'var(--font-display)' }}>
+                    Asistente {settings.businessName}
+                  </h4>
+                  <div style={{ fontSize: '0.68rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '700' }}>
+                    <span className="badge-pulse-dot" style={{ width: '6px', height: '6px' }}></span>
+                    <span>En Línea · Seguridad Electrónica</span>
+                  </div>
                 </div>
               </div>
+
+              <button 
+                onClick={() => setIsOpen(false)}
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ffffff', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                title="Cerrar chat"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <button 
-              onClick={() => setIsOpen(false)}
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
-            >
-              <X size={18} />
-            </button>
-          </div>
+            {/* Cuerpo de Mensajes */}
+            <div className="chat-body">
+              {messages.map((msg) => (
+                <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div className={`message-bubble ${msg.sender === 'user' ? 'message-user' : 'message-bot'}`}>
+                    {msg.text}
+                    {msg.source && (
+                      <div className="source-badge">
+                        <Shield size={11} />
+                        <span>{msg.source}</span>
+                      </div>
+                    )}
+                  </div>
 
-          {/* Cuerpo de Mensajes */}
-          <div className="chat-body">
-            {messages.map((msg) => (
-              <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
-                <div className={`message-bubble ${msg.sender === 'user' ? 'message-user' : 'message-bot'}`}>
-                  {msg.text}
-                  {msg.source && (
-                    <div className="source-badge">
-                      <Shield size={10} />
-                      <span>{msg.source}</span>
+                  {/* Acciones sugeridas y botones de video */}
+                  {msg.sender === 'bot' && msg.suggestedActions && (
+                    <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginTop: '0.45rem', maxWidth: '90%' }}>
+                      {msg.suggestedActions.map((act, i) => (
+                        <button
+                          key={i}
+                          className="prompt-pill-btn"
+                          onClick={() => handlePillClick(act)}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                        >
+                          {act.url && <Video size={12} color="#ef4444" />}
+                          <span>{act.label}</span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
+              ))}
 
-                {/* Acciones sugeridas y botones de video */}
-                {msg.sender === 'bot' && msg.suggestedActions && (
-                  <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginTop: '0.4rem', maxWidth: '88%' }}>
-                    {msg.suggestedActions.map((act, i) => (
-                      <button
-                        key={i}
-                        className="prompt-pill-btn"
-                        onClick={() => handlePillClick(act)}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                      >
-                        {act.url && <Video size={12} color="#dc143c" />}
-                        <span>{act.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              {isLoading && (
+                <div className="message-bubble message-bot" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Sparkles size={15} className="animate-spin" color="var(--brand-crimson-vivid)" />
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Consultando ficha técnica oficial...</span>
+                </div>
+              )}
 
-            {isLoading && (
-              <div className="message-bubble message-bot" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Sparkles size={14} className="animate-spin" color="var(--brand-crimson)" />
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Buscando en catálogo y manuales oficiales...</span>
-              </div>
-            )}
+              <div ref={messagesEndRef} />
+            </div>
 
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Área de Entrada */}
-          <div className="chat-input-area">
-            <input
-              type="text"
-              placeholder="Escribí tu consulta sobre sirenas, alarmas o problemas..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button className="chat-send-btn" onClick={() => handleSend()}>
-              <Send size={16} />
-            </button>
+            {/* Área de Entrada */}
+            <div className="chat-input-area">
+              <input
+                type="text"
+                placeholder="Escribí tu consulta sobre sirenas, alarmas..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                autoFocus
+              />
+              <button className="chat-send-btn" onClick={() => handleSend()}>
+                <Send size={18} />
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
