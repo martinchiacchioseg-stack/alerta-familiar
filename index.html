@@ -1,15 +1,50 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="/logo.jpg" />
-    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <link rel="icon" type="image/jpeg" href="/logo-original.jpg" />
+    <link rel="apple-touch-icon" href="/logo-original.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Alarmas Chascomús - Líderes en Seguridad Electrónica</title>
-    <meta name="description" content="Alarmas inteligentes, videovigilancia IP 4K, protección perimetral y control de accesos en Chascomús y la región." />
+    
+    <title>Alarmas Chascomús - Seguridad Electrónica & Monitoreo 24/7</title>
+    <meta name="description" content="Líderes en seguridad electrónica desde 2006. Sistemas de alarma inteligentes, cámaras CCTV 4K, monitoreo 24/7 y protección perimetral en Chascomús y la región." />
     <meta name="theme-color" content="#dc143c" />
+
+    <!-- Open Graph / Meta -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Alarmas Chascomús - Seguridad Electrónica & Monitoreo 24/7" />
+    <meta property="og:description" content="Más de 20 años cuidando lo que más querés. Alarmas, cámaras, monitoreo inteligente y soporte local en Chascomús." />
+    <meta property="og:image" content="/hero-alarmas-chascomus.webp" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS CDN for guaranteed fast loading and styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                crimson: '#dc143c',
+                vivid: '#ef4444',
+                dark: '#b91c1c',
+                glow: 'rgba(220, 20, 60, 0.45)'
+              }
+            },
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+              display: ['Montserrat', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-[#060911] text-gray-100 antialiased selection:bg-[#dc143c] selection:text-white overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

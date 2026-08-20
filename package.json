@@ -1,5 +1,5 @@
 {
-  "name": "business-ai-assistant",
+  "name": "alarmas-chascomus-landing",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,14 +9,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^13.1.0",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lucide-react": "^0.294.0"
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.2.0",
     "vite": "^5.0.0"
-  }
+  },
+  "description": "Landing page moderna y optimizada para Alarmas Chascomús - Seguridad Electrónica y Monitoreo 24/7"
 }

@@ -1,61 +1,44 @@
-# 🛡️ Alarmas Chascomús - Landing Page & Asistente Virtual Inteligente
+# 🛡️ Alarmas Chascomús - Landing Page Mejorada
 
-> **Líderes en Seguridad Electrónica** · Chascomús y la Región.
+Landing page de alto impacto para **Alarmas Chascomús**, rediseñada con estética de seguridad de vanguardia, microinteracciones, animaciones fluidas y optimización 100% Mobile-First.
 
-Plataforma web oficial y landing page corporativa de **Alarmas Chascomús**, equipada con diseño responsivo de vanguardia, catálogo interactivo de equipamiento homologado y un Asistente Virtual con Inteligencia Artificial especializado en seguridad electrónica.
+## ✨ Características y Secciones Incluidas
 
----
-
-## ✨ Características Principales
-
-- **🎨 Identidad Visual Corporativa:** Diseñado con la paleta de colores institucional (Rojo Carmesí `#DC143C`, Negro Carbón y Blanco), logotipo oficial integrado y fondo inmersivo.
-- **🤖 Asistente Virtual Inteligente (IA Grounded):**
-  - Responde consultas técnicas sobre fábricas homologadas (Garnet Technology, Hikvision, Dahua, Paradox).
-  - Desglose de especificaciones de equipos y sirenas (MP-1000, A2K4-NG, etc.).
-  - Soporte de Preguntas Frecuentes (FAQs) con enlaces a videotutoriales.
-  - Derivación comercial directa para cotizaciones a medida por WhatsApp.
-- **🔒 Panel de Administración Protegido:**
-  - Acceso discreto desde el pie de página con clave configurable.
-  - Rastreador web para indexar URLs de fábricas y distribuidores.
-  - Gestor de FAQs y videotutoriales.
-  - Cargador de manuales PDF (con opción de permitir o bloquear descarga pública por clientes).
-  - Editor de System Prompt y personalidad de la IA.
+1. **Navbar Glassmorphic**: Barra de navegación flotante con efecto blur, logo oficial de la marca, enlaces con scroll suave y acceso directo a WhatsApp y llamada.
+2. **Hero Section de Alto Impacto**: Encabezado optimizado, badge de 20 años de trayectoria, calificación Google Reviews 4.9★ y botones de acción rápida.
+3. **Banner de Respaldo Institucional**: Validación con entidades donde Alarmas Chascomús brinda soporte técnico (Banco Santander, Banco Macro, Andreani, Correo Argentino).
+4. **Quiénes Somos (20 Años / 2006-2026)**: Los 4 pilares de la empresa (Trayectoria, Respaldo, Calidad e Innovación).
+5. **Nuestros Servicios**: Grid interactivo con los 5 servicios clave (Alarmas, CCTV, Sensores/Perimetral, Control de Acceso y Monitoreo 24/7).
+6. **Spotlight de Monitoreo Inteligente 24/7**: Sección destacada sobre la app móvil y central operativa.
+7. **Galería de Trabajos**: Carrusel fotográfico con proyectos residenciales y comerciales + estadísticas en números.
+8. **Cotizador Express Online**: Herramienta interactiva para seleccionar tipo de inmueble y servicios, enviando el presupuesto pre-armado a WhatsApp con 1 clic.
+9. **Reseñas y Google Social Proof**: Calificación oficial 4.9/5 con opiniones reales y enlace a Google Mi Negocio.
+10. **Preguntas Frecuentes (FAQ)**: Acordeón interactivo con dudas comunes (cortes de luz, app en el celular, mascotas, etc.).
+11. **Contacto y Cobertura**: Canales directos (WhatsApp, llamada, cobertura en Chascomús y alrededores) y formulario de contacto.
+12. **Footer Corporativo**: Información legal, enlaces y redes sociales (@dealarma en Instagram).
+13. **Widget Flotante de WhatsApp**: Botón animado con estado de asesor en línea.
 
 ---
 
-## 🚀 Tecnologías Utilizadas
+## 🚀 Despliegue en Vercel
 
-- **React 18** + **Vite**
-- **Lucide Icons**
-- **Vanilla CSS3** (Variables CSS, Glassmorphism, animaciones sutiles)
-
----
-
-## 🛠️ Instalación y Ejecución Local
-
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/TU-USUARIO/alarmas-chascomus.git
-   cd alarmas-chascomus
-   ```
-
-2. Instalar dependencias:
-   ```bash
-   npm install
-   ```
-
-3. Iniciar el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
-
-4. Compilar para producción:
-   ```bash
-   npm run build
-   ```
+1. Subí este proyecto a un repositorio de GitHub.
+2. Ingresá a [Vercel](https://vercel.com) y hacé clic en **Add New Project**.
+3. Importá el repositorio.
+4. Framework Preset: **Vite** (automático).
+5. Hacé clic en **Deploy**. ¡Listo en menos de 1 minuto!
 
 ---
 
-## 🏢 Créditos
+## 💻 Desarrollo Local
 
-Desarrollado para **Alarmas Chascomús** — *Líderes en Seguridad Electrónica*.
+```bash
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev
+
+# Compilar para producción
+npm run build
+```
