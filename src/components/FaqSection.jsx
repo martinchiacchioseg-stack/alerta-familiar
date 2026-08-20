@@ -18,8 +18,8 @@ export default function FaqSection() {
       a: "No. Instalamos sensores infrarrojos pasivos con tecnología antimascotas (Pet Immune) que discriminan animales domésticos de hasta 20kg a 25kg, evitando por completo los falsos disparos."
     },
     {
-      q: "¿Cómo funciona el nuevo servicio de Monitoreo Inteligente 24/7?",
-      a: "Tu sistema se conecta directamente a nuestra central receptora. Ante un evento de disparo, pánico, corte de línea o sabotaje, nuestros operadores verifican la señal en segundos y coordinan la asistencia inmediata."
+      q: "¿Hay que pagar abonos mensuales o costos fijos obligatorios?",
+      a: "No. Nuestros sistemas de alarma residencial y comercial con aviso directo al celular son de tu propiedad y funcionan de forma autónoma sin que tengas que abonar cuotas mensuales obligatorias."
     },
     {
       q: "¿Cuál es la zona de cobertura para instalaciones y servicio técnico?",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Menu, X, Phone, MessageCircle, ArrowRight } from 'lucide-react';
+import { Shield, Menu, X, Phone, ArrowRight } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +30,6 @@ export default function Navbar() {
       });
     }
   };
-
-  const whatsappUrl = `https://wa.me/5492241527180?text=${encodeURIComponent("Hola, me gustaría conocer más sobre los servicios de Alarmas Chascomús")}`;
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -95,11 +93,10 @@ export default function Navbar() {
               Servicios
             </button>
             <button 
-              onClick={() => scrollToSection('monitoreo')} 
+              onClick={() => scrollToSection('app-movil')} 
               className="px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold text-[#EF4444] bg-[#DC143C]/15 hover:bg-[#DC143C]/25 transition-all duration-200 flex items-center gap-1.5"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-ping"></span>
-              Monitoreo 24/7
+              Control en tu Celular
             </button>
             <button 
               onClick={() => scrollToSection('galeria')} 
@@ -121,37 +118,25 @@ export default function Navbar() {
             </button>
           </nav>
 
-          {/* Desktop Right CTA */}
+          {/* Desktop Right CTA - Direct Phone */}
           <div className="hidden md:flex items-center gap-3">
             <a 
               href="tel:+5492241527180" 
-              className="flex items-center gap-2 text-xs xl:text-sm text-gray-300 hover:text-white font-medium px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+              className="inline-flex items-center gap-2 bg-[#DC143C] hover:bg-[#b91c1c] text-white px-5 py-2.5 rounded-full text-xs xl:text-sm font-bold shadow-[0_0_20px_rgba(220,20,60,0.4)] hover:shadow-[0_0_25px_rgba(220,20,60,0.7)] transition-all duration-200 transform hover:-translate-y-0.5"
             >
-              <Phone size={14} className="text-[#DC143C]" />
-              <span>(02241) 15-527180</span>
-            </a>
-            
-            <a 
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#DC143C] hover:bg-[#b91c1c] text-white px-4 py-2 rounded-full text-xs xl:text-sm font-bold shadow-[0_0_20px_rgba(220,20,60,0.4)] hover:shadow-[0_0_25px_rgba(220,20,60,0.7)] transition-all duration-200 transform hover:-translate-y-0.5"
-            >
-              <MessageCircle size={16} />
-              <span>WhatsApp</span>
+              <Phone size={15} />
+              <span>Llamar: (02241) 15-527180</span>
             </a>
           </div>
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex lg:hidden items-center gap-2">
             <a 
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-[#DC143C] text-white rounded-full shadow-md active:scale-95"
-              aria-label="WhatsApp"
+              href="tel:+5492241527180" 
+              className="p-2.5 bg-[#DC143C] text-white rounded-full shadow-md active:scale-95 flex items-center justify-center"
+              aria-label="Llamar"
             >
-              <MessageCircle size={18} />
+              <Phone size={18} />
             </a>
             <button 
               onClick={() => setIsOpen(!isOpen)}
@@ -193,13 +178,10 @@ export default function Navbar() {
           </button>
 
           <button 
-            onClick={() => scrollToSection('monitoreo')}
+            onClick={() => scrollToSection('app-movil')}
             className="w-full text-left px-4 py-3 rounded-xl text-base font-semibold text-[#EF4444] bg-[#DC143C]/10 border border-[#DC143C]/30 flex items-center justify-between"
           >
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-pulse"></span>
-              Monitoreo Inteligente 24/7
-            </span>
+            <span>Control desde tu Celular</span>
             <ArrowRight size={16} />
           </button>
 
@@ -230,20 +212,10 @@ export default function Navbar() {
           <div className="pt-4 mt-2 border-t border-white/10 flex flex-col gap-2.5">
             <a 
               href="tel:+5492241527180" 
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-gray-200 font-semibold border border-white/10 active:bg-white/10"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#DC143C] hover:bg-[#b91c1c] text-white font-bold shadow-lg"
             >
-              <Phone size={16} className="text-[#DC143C]" />
-              <span>Llamar: (02241) 15-527180</span>
-            </a>
-            
-            <a 
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#DC143C] hover:bg-[#b91c1c] text-white font-bold shadow-lg"
-            >
-              <MessageCircle size={18} />
-              <span>Enviar WhatsApp Directo</span>
+              <Phone size={18} />
+              <span>Llamar al (02241) 15-527180</span>
             </a>
           </div>
         </div>

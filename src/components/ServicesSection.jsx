@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Video, Flame, KeyRound, Radio, ArrowRight, CheckCircle2, MessageCircle } from 'lucide-react';
+import { Shield, Video, Flame, KeyRound, Smartphone, Phone, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function ServicesSection() {
   const services = [
@@ -8,7 +8,6 @@ export default function ServicesSection() {
       title: "Sistemas de Alarma Residencial y Comercial",
       desc: "Protección integral para tu hogar y negocio con tecnología de última generación.",
       icon: Shield,
-      isNew: false,
       features: [
         "Sensores de movimiento inmunes a mascotas",
         "Avisos instantáneos al teléfono celular",
@@ -19,9 +18,8 @@ export default function ServicesSection() {
     {
       id: 2,
       title: "Cámaras de Seguridad (CCTV) con Acceso Remoto",
-      desc: "Monitorea tu propiedad en tiempo real desde cualquier lugar del mundo.",
+      desc: "Monitoreá tu propiedad en tiempo real desde cualquier lugar del mundo.",
       icon: Video,
-      isNew: false,
       features: [
         "Visión nocturna a color las 24 horas",
         "Detección inteligente de personas y vehículos",
@@ -32,9 +30,8 @@ export default function ServicesSection() {
     {
       id: 3,
       title: "Sensores de Incendio y Protección Perimetral",
-      desc: "Detecta amenazas antes de que se conviertan en problemas graves.",
+      desc: "Detectá amenazas antes de que se conviertan en problemas graves.",
       icon: Flame,
-      isNew: false,
       features: [
         "Detección temprana de humo y temperatura",
         "Barreras infrarrojas para patios y fondos",
@@ -45,9 +42,8 @@ export default function ServicesSection() {
     {
       id: 4,
       title: "Sistemas de Control de Acceso",
-      desc: "Controla quién entra y sale con tecnología biométrica y de tarjetas.",
+      desc: "Controlá quién entra y sale con tecnología biométrica y de tarjetas.",
       icon: KeyRound,
-      isNew: false,
       features: [
         "Reconocimiento facial y huella dactilar",
         "Cerraduras magnéticas de alta resistencia",
@@ -57,22 +53,17 @@ export default function ServicesSection() {
     },
     {
       id: 5,
-      title: "Nuevo: Monitoreo Inteligente 24/7",
-      desc: "Respuesta rápida y eficiente con tecnología de última generación conectada permanentemente.",
-      icon: Radio,
-      isNew: true,
+      title: "Automatización & Aviso Directo al Celular",
+      desc: "Tu sistema te avisa directo a tu teléfono ante cualquier evento, sin pagar abonos mensuales.",
+      icon: Smartphone,
       features: [
-        "Monitoreo activo las 24 horas, los 365 días",
-        "Respuesta inmediata ante disparos o corte de luz",
-        "Verificación por video y aviso a las fuerzas de seguridad",
-        "Atención personalizada por operadores locales"
+        "Notificaciones push instantáneas en tu smartphone",
+        "Armado y desarmado remoto con un toque",
+        "Reporte de estado de batería y cortes de 220V",
+        "Sin contratos forzados ni cuotas mensuales"
       ]
     }
   ];
-
-  const getWhatsAppServiceLink = (serviceName) => {
-    return `https://wa.me/5492241527180?text=${encodeURIComponent(`Hola, me gustaría solicitar asesoramiento y cotización para el servicio: ${serviceName}`)}`;
-  };
 
   return (
     <section id="servicios" className="py-20 md:py-28 bg-[#060911] relative overflow-hidden">
@@ -104,33 +95,19 @@ export default function ServicesSection() {
             return (
               <div 
                 key={srv.id}
-                className={`relative rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between group ${
-                  srv.isNew 
-                    ? 'bg-gradient-to-b from-[#DC143C]/20 via-[#111827] to-[#0a0e17] border-2 border-[#DC143C] shadow-[0_0_30px_rgba(220,20,60,0.25)] md:col-span-2 lg:col-span-1' 
-                    : 'bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-[#DC143C]/50 shadow-xl'
-                }`}
+                className="relative rounded-3xl p-8 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-[#DC143C]/50 shadow-xl transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   
-                  {/* Top Bar with Icon & Badge */}
+                  {/* Top Bar with Icon & Number */}
                   <div className="flex items-center justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                      srv.isNew 
-                        ? 'bg-[#DC143C] text-white shadow-lg shadow-[#DC143C]/50' 
-                        : 'bg-[#DC143C]/10 border border-[#DC143C]/30 text-[#EF4444] group-hover:bg-[#DC143C] group-hover:text-white'
-                    }`}>
+                    <div className="w-14 h-14 rounded-2xl bg-[#DC143C]/10 border border-[#DC143C]/30 text-[#EF4444] group-hover:bg-[#DC143C] group-hover:text-white flex items-center justify-center transition-all duration-300">
                       <Icon size={26} />
                     </div>
 
-                    {srv.isNew ? (
-                      <span className="px-3 py-1 rounded-full bg-[#DC143C] text-white text-xs font-black tracking-wider uppercase animate-pulse shadow-md">
-                        NUEVO 2026
-                      </span>
-                    ) : (
-                      <span className="text-xs font-bold text-gray-500">
-                        #0{srv.id}
-                      </span>
-                    )}
+                    <span className="text-xs font-bold text-gray-500">
+                      #0{srv.id}
+                    </span>
                   </div>
 
                   {/* Title & Desc */}
@@ -154,19 +131,13 @@ export default function ServicesSection() {
 
                 </div>
 
-                {/* Card CTA */}
+                {/* Card CTA: Direct Call */}
                 <a 
-                  href={getWhatsAppServiceLink(srv.title)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
-                    srv.isNew
-                      ? 'bg-[#DC143C] hover:bg-[#b91c1c] text-white shadow-lg'
-                      : 'bg-white/5 hover:bg-[#DC143C] text-gray-200 hover:text-white border border-white/10 hover:border-transparent'
-                  }`}
+                  href="tel:+5492241527180"
+                  className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 bg-white/5 hover:bg-[#DC143C] text-gray-200 hover:text-white border border-white/10 hover:border-transparent transition-all duration-200"
                 >
-                  <MessageCircle size={16} />
-                  <span>Consultar por este servicio</span>
+                  <Phone size={15} />
+                  <span>Consultar: (02241) 15-527180</span>
                   <ArrowRight size={15} className="ml-auto opacity-70" />
                 </a>
 

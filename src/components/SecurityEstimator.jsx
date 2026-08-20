@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Store, Factory, TreePine, Shield, Video, Radio, Zap, KeyRound, MessageCircle, Sparkles } from 'lucide-react';
+import { Home, Store, Factory, TreePine, Shield, Video, Smartphone, Zap, KeyRound, Phone, Sparkles } from 'lucide-react';
 
 export default function SecurityEstimator() {
   const propertyTypes = [
@@ -12,7 +12,7 @@ export default function SecurityEstimator() {
   const systemsList = [
     { id: 'alarmas', label: 'Sistema de Alarma Inteligente', icon: Shield },
     { id: 'cctv', label: 'Cámaras de Seguridad CCTV (Acceso Celular)', icon: Video },
-    { id: 'monitoreo', label: 'Monitoreo Central 24/7', icon: Radio },
+    { id: 'app', label: 'Control & Aviso en el Celular (Sin Abonos)', icon: Smartphone },
     { id: 'perimetral', label: 'Cerco Eléctrico / Sensores Exteriores', icon: Zap },
     { id: 'acceso', label: 'Control de Acceso / Biometría', icon: KeyRound }
   ];
@@ -31,22 +31,6 @@ export default function SecurityEstimator() {
   };
 
   const getPropertyLabel = () => propertyTypes.find(p => p.id === selectedProperty)?.label || selectedProperty;
-
-  const getSystemsSummary = () => {
-    return systemsList
-      .filter(s => selectedSystems.includes(s.id))
-      .map(s => s.label)
-      .join(', ');
-  };
-
-  const generateWhatsAppLink = () => {
-    const text = `Hola Alarmas Chascomús! Estuve usando el Cotizador de la web. Quisiera recibir asesoramiento y presupuesto personalizado para:
-- Inmueble: ${getPropertyLabel()}
-- Sistemas de interés: ${getSystemsSummary()}
-- Ubicación: Chascomús o alrededores`;
-
-    return `https://wa.me/5492241527180?text=${encodeURIComponent(text)}`;
-  };
 
   return (
     <section id="cotizador" className="py-20 md:py-28 bg-[#0a0e17] relative overflow-hidden border-t border-white/10">
@@ -68,7 +52,7 @@ export default function SecurityEstimator() {
           </h2>
 
           <p className="text-base sm:text-lg text-gray-400 leading-relaxed">
-            Elegí el tipo de propiedad y los sistemas que necesitás para recibir una propuesta personalizada al instante por WhatsApp.
+            Elegí el tipo de propiedad y los sistemas que necesitás para recibir una propuesta personalizada al instante por teléfono.
           </p>
         </div>
 
@@ -140,7 +124,7 @@ export default function SecurityEstimator() {
             </div>
           </div>
 
-          {/* Summary & Direct WhatsApp Submission */}
+          {/* Summary & Direct Phone Call */}
           <div className="p-6 rounded-2xl bg-[#DC143C]/10 border border-[#DC143C]/30 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">
               <span className="text-xs font-bold uppercase tracking-wider text-[#EF4444]">Configuración Lista</span>
@@ -148,18 +132,16 @@ export default function SecurityEstimator() {
                 Cotizar para {getPropertyLabel()} ({selectedSystems.length} {selectedSystems.length === 1 ? 'servicio' : 'servicios'})
               </h4>
               <p className="text-xs text-gray-400">
-                Te enviamos un presupuesto sin cargo y sin compromiso a tu WhatsApp en pocos minutos.
+                Llamanos directamente para recibir un presupuesto sin cargo y sin compromiso.
               </p>
             </div>
 
             <a 
-              href={generateWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="tel:+5492241527180"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#DC143C] hover:bg-[#b91c1c] text-white font-bold rounded-2xl shadow-[0_10px_25px_rgba(220,20,60,0.5)] transition-all duration-200 flex-shrink-0"
             >
-              <MessageCircle size={20} />
-              <span>Enviar Cotización a WhatsApp</span>
+              <Phone size={20} />
+              <span>Llamar al (02241) 15-527180</span>
             </a>
           </div>
 

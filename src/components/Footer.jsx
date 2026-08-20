@@ -1,12 +1,10 @@
 import React from 'react';
-import { Shield, Phone, MessageCircle, MapPin, Instagram, ArrowUp } from 'lucide-react';
+import { Shield, Phone, MapPin, Instagram, ArrowUp } from 'lucide-react';
 
 export default function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const whatsappUrl = `https://wa.me/5492241527180?text=${encodeURIComponent("Hola, me gustaría comunicarme con Alarmas Chascomús")}`;
 
   return (
     <footer className="bg-[#04060a] text-white pt-16 pb-12 border-t border-white/10">
@@ -46,13 +44,11 @@ export default function Footer() {
               </a>
 
               <a 
-                href={whatsappUrl}
-                target="_blank" 
-                rel="noopener noreferrer"
+                href="tel:+5492241527180"
                 className="w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center text-white transition-colors"
-                aria-label="WhatsApp"
+                aria-label="Llamar por Teléfono"
               >
-                <MessageCircle size={18} />
+                <Phone size={16} />
               </a>
             </div>
           </div>
@@ -63,7 +59,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
               <li><a href="#servicios" className="hover:text-[#EF4444] transition-colors">Alarmas Residenciales</a></li>
               <li><a href="#servicios" className="hover:text-[#EF4444] transition-colors">CCTV y Cámaras 4K</a></li>
-              <li><a href="#monitoreo" className="text-[#EF4444] font-semibold hover:underline">Monitoreo Inteligente 24/7</a></li>
+              <li><a href="#app-movil" className="text-[#EF4444] font-semibold hover:underline">Control en tu Celular</a></li>
               <li><a href="#servicios" className="hover:text-[#EF4444] transition-colors">Cercos Perimetrales</a></li>
               <li><a href="#servicios" className="hover:text-[#EF4444] transition-colors">Control de Acceso</a></li>
             </ul>
@@ -84,17 +80,17 @@ export default function Footer() {
 
           {/* Col 4: Contacto */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Contacto</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Contacto Directo</h4>
             <div className="space-y-2 text-xs sm:text-sm text-gray-400">
               <a href="tel:+5492241527180" className="flex items-center gap-2 hover:text-[#DC143C] transition-colors">
                 <Phone size={14} className="text-[#DC143C]" />
+                <span>(02241) 15-527180</span>
+              </a>
+              <a href="tel:+5492241527180" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                <Phone size={14} className="text-emerald-500" />
                 <span>+54 9 224 152-7180</span>
               </a>
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                <MessageCircle size={14} className="text-emerald-500" />
-                <span>WhatsApp: +54 9 224 152-7180</span>
-              </a>
-              <p className="text-xs text-gray-500 pt-1">Atención comercial y técnica en Chascomús.</p>
+              <p className="text-xs text-gray-500 pt-1">Atención técnica y asesoramiento en Chascomús.</p>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MessageCircle, MapPin, Send, CheckCircle2, Clock } from 'lucide-react';
+import { Phone, MapPin, Send, CheckCircle2, Clock } from 'lucide-react';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -12,19 +12,8 @@ export default function ContactSection() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Preparamos mensaje para WhatsApp directo con los datos del form
-    const text = `Hola Alarmas Chascomús! Envío consulta desde la web:
-- Nombre: ${formData.nombre}
-- Email: ${formData.email}
-- Teléfono: ${formData.telefono || 'No especificado'}
-- Mensaje: ${formData.mensaje}`;
-
-    const waUrl = `https://wa.me/5492241527180?text=${encodeURIComponent(text)}`;
     setSubmitted(true);
-    window.open(waUrl, '_blank');
   };
-
-  const whatsappDirect = `https://wa.me/5492241527180?text=${encodeURIComponent("Hola, me gustaría comunicarme con Alarmas Chascomús")}`;
 
   return (
     <section id="contacto" className="py-20 md:py-28 bg-[#060911] relative overflow-hidden border-t border-white/10">
@@ -52,39 +41,37 @@ export default function ContactSection() {
         {/* Contact Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           
-          {/* Card 1: WhatsApp */}
-          <div className="p-8 rounded-3xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-[#DC143C]/50 transition-all duration-300 text-center flex flex-col items-center justify-between">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4">
-              <MessageCircle size={26} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-1">WhatsApp Directo</h3>
-              <p className="text-xs text-gray-400 mb-4">Respuesta rápida y directa con un asesor</p>
-            </div>
-            <a 
-              href={whatsappDirect}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md transition-colors"
-            >
-              +54 9 224 152-7180
-            </a>
-          </div>
-
-          {/* Card 2: Phone */}
+          {/* Card 1: Phone */}
           <div className="p-8 rounded-3xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-[#DC143C]/50 transition-all duration-300 text-center flex flex-col items-center justify-between">
             <div className="w-14 h-14 rounded-2xl bg-[#DC143C]/10 border border-[#DC143C]/30 flex items-center justify-center text-[#EF4444] mb-4">
               <Phone size={26} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white mb-1">Llamada Telefónica</h3>
-              <p className="text-xs text-gray-400 mb-4">Línea directa para atención y urgencias</p>
+              <h3 className="text-xl font-bold text-white mb-1">Línea Principal</h3>
+              <p className="text-xs text-gray-400 mb-4">Llamadas directas para asesoramiento</p>
             </div>
             <a 
               href="tel:+5492241527180"
               className="px-6 py-2.5 rounded-full bg-[#DC143C] hover:bg-[#b91c1c] text-white text-xs font-bold shadow-md transition-colors"
             >
               (02241) 15-527180
+            </a>
+          </div>
+
+          {/* Card 2: Phone Alternative */}
+          <div className="p-8 rounded-3xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-[#DC143C]/50 transition-all duration-300 text-center flex flex-col items-center justify-between">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4">
+              <Phone size={26} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-1">Teléfono Directo</h3>
+              <p className="text-xs text-gray-400 mb-4">Contacto comercial y técnico</p>
+            </div>
+            <a 
+              href="tel:+5492241527180"
+              className="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-colors"
+            >
+              +54 9 224 152-7180
             </a>
           </div>
 
@@ -111,7 +98,7 @@ export default function ContactSection() {
               Envianos tu Mensaje
             </h3>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">
-              Completá el formulario y te responderemos a la brevedad.
+              Completá el formulario y nos comunicaremos con vos a la brevedad.
             </p>
           </div>
 
@@ -164,7 +151,7 @@ export default function ContactSection() {
 
               <div className="space-y-2">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-300">
-                  Teléfono / WhatsApp (Opcional)
+                  Teléfono de Contacto (Opcional)
                 </label>
                 <input 
                   type="tel" 
@@ -194,7 +181,7 @@ export default function ContactSection() {
                 className="w-full py-4 bg-[#DC143C] hover:bg-[#b91c1c] text-white text-base font-bold rounded-2xl shadow-[0_10px_25px_rgba(220,20,60,0.5)] transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Send size={18} />
-                <span>Enviar Consulta Directa</span>
+                <span>Enviar Consulta</span>
               </button>
 
               <p className="text-[11px] text-gray-500 text-center">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, CheckCircle2, Shield, Users, Wrench } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shield, Users, Wrench } from 'lucide-react';
 
 export default function GallerySection() {
   const images = [
@@ -18,7 +18,7 @@ export default function GallerySection() {
     {
       id: 3,
       title: "Panel de Control Digital",
-      desc: "Panel de control moderno con indicadores LED, teclado táctil y monitoreo 24/7.",
+      desc: "Panel de control moderno con indicadores LED, teclado táctil y aviso al celular.",
       src: "/gallery-3-panel.webp"
     },
     {

@@ -1,9 +1,7 @@
 import React from 'react';
-import { ShieldCheck, MessageCircle, Eye, Star, CheckCircle, Bell, Wifi, Smartphone } from 'lucide-react';
+import { ShieldCheck, Phone, Eye, Star, CheckCircle, Smartphone } from 'lucide-react';
 
 export default function HeroSection() {
-  const whatsappUrl = `https://wa.me/5492241527180?text=${encodeURIComponent("Hola, me gustaría conocer más sobre los servicios de Alarmas Chascomús")}`;
-
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -17,7 +15,7 @@ export default function HeroSection() {
   return (
     <section id="inicio" className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-gradient-to-b from-[#060911] via-[#0a0e17] to-[#060911]">
       
-      {/* Background Decorative Lighting Gradients */}
+      {/* Decorative Lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#DC143C]/15 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute top-2/3 right-10 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -46,20 +44,18 @@ export default function HeroSection() {
               </h1>
               
               <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                Líderes en seguridad electrónica, videovigilancia y monitoreo inteligente. Más de 20 años de trayectoria y excelencia técnica cuidando a los vecinos de la zona.
+                Líderes en seguridad electrónica, videovigilancia y sistemas de alarma inteligentes. Más de 20 años de trayectoria y excelencia técnica cuidando a los vecinos de la zona.
               </p>
             </div>
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
               <a 
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="tel:+5492241527180"
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#DC143C] hover:bg-[#b91c1c] text-white text-base sm:text-lg font-bold rounded-2xl shadow-[0_10px_30px_rgba(220,20,60,0.45)] hover:shadow-[0_15px_35px_rgba(220,20,60,0.65)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0"
               >
-                <MessageCircle size={22} className="text-white" />
-                <span>Contactar por WhatsApp</span>
+                <Phone size={22} className="text-white" />
+                <span>Llamar al (02241) 15-527180</span>
               </a>
 
               <button 
@@ -90,7 +86,7 @@ export default function HeroSection() {
               {/* Guarantees */}
               <div className="flex items-center gap-1.5 text-gray-300 font-medium">
                 <CheckCircle size={16} className="text-emerald-400" />
-                <span>Asistencia Local Directa</span>
+                <span>Atención Local Directa</span>
               </div>
 
               <div className="flex items-center gap-1.5 text-gray-300 font-medium">
@@ -127,7 +123,7 @@ export default function HeroSection() {
                   {/* Top Floating Badge */}
                   <div className="absolute top-3 left-3 bg-[#0a0e17]/85 backdrop-blur-md border border-white/15 rounded-full px-3 py-1 text-xs font-semibold text-white flex items-center gap-1.5 shadow-lg">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Sistema Operativo 24/7</span>
+                    <span>Instalación Profesional Garantizada</span>
                   </div>
 
                   {/* Bottom Image Overlay Tag */}
@@ -143,7 +139,7 @@ export default function HeroSection() {
                     </div>
                     <div className="text-right">
                       <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">
-                        CONECTADO
+                        ACTIVO
                       </span>
                     </div>
                   </div>
@@ -160,8 +156,8 @@ export default function HeroSection() {
                     <p className="text-[10px] text-gray-400 font-medium">Chascomús</p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <p className="text-sm sm:text-base font-black text-emerald-400">24/7</p>
-                    <p className="text-[10px] text-gray-400 font-medium">Monitoreo</p>
+                    <p className="text-sm sm:text-base font-black text-emerald-400">Garantía</p>
+                    <p className="text-[10px] text-gray-400 font-medium">Oficial</p>
                   </div>
                 </div>
 

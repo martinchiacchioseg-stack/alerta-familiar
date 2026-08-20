@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Building, Sparkles, Cpu, CheckCircle } from 'lucide-react';
+import { Award, Building, Sparkles, Smartphone, CheckCircle } from 'lucide-react';
 
 export default function AboutSection() {
   const pillars = [
@@ -13,19 +13,19 @@ export default function AboutSection() {
       icon: Building,
       title: "Respaldo y Confianza",
       tag: "Alianzas Estratégicas",
-      desc: "Nuestra capacidad técnica y profesionalismo nos permiten actuar como aliados estratégicos de grandes organizaciones. Actualmente, brindamos servicios de soporte técnico y atención especializada de forma tercerizada para clientes de entidades de primera línea, tales como Banco Santander, Banco Macro, Andreani y Correo Argentino, entre otros."
+      desc: "Nuestra capacidad técnica y profesionalismo nos permiten actuar como aliados estratégicos de grandes organizaciones. Brindamos servicios de soporte técnico y atención especializada de forma tercerizada para clientes de entidades de primera línea, tales como Banco Santander, Banco Macro, Andreani y Correo Argentino, entre otros."
     },
     {
       icon: Sparkles,
       title: "Compromiso con la Calidad",
       tag: "Excelencia Técnica",
-      desc: "Nuestra filosofía siempre ha sido clara: excelencia técnica al alcance de todos. Nos destacamos por ofrecer un servicio de instalación y mantenimiento de primer nivel, utilizando equipamiento de vanguardia. Gracias a nuestras alianzas estratégicas con marcas líderes, logramos el equilibrio perfecto entre la más alta calidad y costos competitivos."
+      desc: "Nuestra filosofía siempre ha sido clara: excelencia técnica al alcance de todos. Nos destacamos por ofrecer un servicio de instalación y mantenimiento de primer nivel, utilizando equipamiento de vanguardia de marcas líderes reconocidas a nivel nacional e internacional."
     },
     {
-      icon: Cpu,
-      title: "Innovación Tecnológica",
-      tag: "Monitoreo Inteligente 24/7",
-      desc: "Al celebrar nuestros 20 años de trayectoria, damos un paso decisivo hacia el futuro de la seguridad. Inauguramos una nueva etapa con la incorporación de Monitoreo Inteligente, una solución avanzada que integra tecnología de última generación para una respuesta más rápida, eficiente y conectada."
+      icon: Smartphone,
+      title: "Tecnología en tu Celular",
+      tag: "Control Total Sin Abonos",
+      desc: "Instalamos centrales de alarma y cámaras con conexión a internet y telefonía móvil, permitiéndote recibir avisos instantáneos, armar o desarmar el sistema y visualizar tu propiedad en tiempo real desde tu smartphone, sin pagar costos mensuales innecesarios."
     }
   ];
 
@@ -48,7 +48,7 @@ export default function AboutSection() {
           </h2>
           
           <p className="text-base sm:text-lg text-gray-400 leading-relaxed">
-            Dos décadas de compromiso inquebrantable con la tranquilidad y protección de las familias y empresas de Chascomús.
+            Dos décadas de compromiso inquebrantable con la tranquilidad y protección de las familias y comercios de Chascomús.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export default function AboutSection() {
 
                 <div className="pt-6 mt-6 border-t border-white/5 flex items-center gap-2 text-xs font-semibold text-[#EF4444]">
                   <CheckCircle size={15} />
-                  <span>Estándar de Seguridad Certificado</span>
+                  <span>Estándar de Seguridad Profesional</span>
                 </div>
               </div>
             );
