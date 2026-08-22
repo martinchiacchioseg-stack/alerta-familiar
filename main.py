@@ -133,29 +133,29 @@ async def receive_webhook(request: Request):
     return JSONResponse(content={"status": "EVENT_RECEIVED"}, status_code=200)
 
 # ==========================================
-# 2. REST API PARA EL PANEL DE CONTROL (PROTEGIDO)
+# 2. REST API PARA EL PANEL DE CONTROL (PÚBLICO PARA REVISIÓN DE META)
 # ==========================================
 
-@app.get("/api/contacts", dependencies=[Depends(require_auth)])
+@app.get("/api/contacts")
 async def api_get_contacts():
     """Devuelve la lista ordenada de contactos y su último estado"""
     contacts = get_contacts()
     return JSONResponse(content=contacts)
 
-@app.get("/api/messages/{phone}", dependencies=[Depends(require_auth)])
+@app.get("/api/messages/{phone}")
 async def api_get_messages(phone: str):
     """Devuelve los mensajes de una conversación y marca como leídos"""
     messages = get_messages(phone)
     mark_as_read(phone)
     return JSONResponse(content=messages)
 
-@app.post("/api/toggle-bot", dependencies=[Depends(require_auth)])
+@app.post("/api/toggle-bot")
 async def api_toggle_bot(req: ToggleBotRequest):
     """Activa o pausa la IA para un número particular"""
     status_updated = toggle_bot(req.phone, req.bot_active)
     return JSONResponse(content={"phone": req.phone, "bot_active": status_updated})
 
-@app.post("/api/send-message", dependencies=[Depends(require_auth)])
+@app.post("/api/send-message")
 async def api_send_message(req: SendMessageRequest):
     """Envía un mensaje manual de operador hacia el cliente por WhatsApp"""
     if not req.text.strip():
@@ -221,7 +221,7 @@ async def api_debug_meta(phone: str):
 # 3. SPA FRONTEND (ESTILO WHATSAPP WEB)
 # ==========================================
 
-@app.get("/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
+@app.get("/", response_class=HTMLResponse)
 async def serve_spa():
     html_content = """
 <!DOCTYPE html>
