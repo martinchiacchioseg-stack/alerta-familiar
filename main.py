@@ -159,6 +159,54 @@ async def api_send_message(req: SendMessageRequest):
 
     return JSONResponse(content=saved)
 
+@app.get("/api/debug-meta/{phone}")
+async def api_debug_meta(phone: str):
+    """Diagnóstico en vivo para probar el envío y ver el error exacto de Meta"""
+    import httpx
+    load_dotenv(override=True)
+    token = os.getenv("META_ACCESS_TOKEN", "")
+    phone_id = os.getenv("PHONE_NUMBER_ID", "")
+    
+    debug_info = {
+        "token_configured": bool(token and token != "PEGA_AQUI_TU_META_ACCESS_TOKEN"),
+        "token_prefix": token[:10] if token else "None",
+        "token_length": len(token) if token else 0,
+        "phone_id": phone_id,
+        "target_phone": phone
+    }
+    
+    if not token or not phone_id or token == "PEGA_AQUI_TU_META_ACCESS_TOKEN" or phone_id == "PEGA_AQUI_TU_PHONE_NUMBER_ID":
+        return JSONResponse(content={"status": "CONFIG_ERROR", "detail": "Variables de entorno no configuradas en Render", "debug": debug_info}, status_code=400)
+        
+    url = f"https://graph.facebook.com/v20.0/{phone_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": str(phone),
+        "type": "text",
+        "text": {"preview_url": False, "body": "Prueba de conexion directa desde Render a WhatsApp"}
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await client.post(url, headers=headers, json=payload)
+            try:
+                res_body = res.json()
+            except:
+                res_body = res.text
+            return JSONResponse(content={
+                "debug": debug_info,
+                "meta_http_status": res.status_code,
+                "meta_response": res_body
+            })
+    except Exception as e:
+        return JSONResponse(content={"status": "EXCEPTION", "error": str(e), "debug": debug_info}, status_code=500)
+
+
 # ==========================================
 # 3. SPA FRONTEND (ESTILO WHATSAPP WEB)
 # ==========================================

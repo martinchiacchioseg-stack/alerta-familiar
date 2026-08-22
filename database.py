@@ -1,9 +1,10 @@
 import sqlite3
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alarmas_chats.db")
+ARG_TZ = timezone(timedelta(hours=-3))
 
 def get_db_connection() -> sqlite3.Connection:
     """Crea una conexión con sqlite3 configurada con row_factory como diccionario"""
@@ -54,7 +55,7 @@ def save_message(phone: str, sender: str, text: str, name: Optional[str] = None)
     """
     conn = get_db_connection()
     cursor = conn.cursor()
-    now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    now = datetime.now(ARG_TZ).strftime('%Y-%m-%d %H:%M:%S')
 
     # 1. Verificar si el contacto existe
     cursor.execute("SELECT phone, name, unread_count FROM contacts WHERE phone = ?", (phone,))
