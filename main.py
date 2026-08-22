@@ -53,19 +53,18 @@ class SendMessageRequest(BaseModel):
     text: str
 
 # ==========================================
-# 1. WEBHOOKS META (WHATSAPP CLOUD API)
+# 1. WEBHOOKS META (WHATSAPP CLOUD API) - PÚBLICO
 # ==========================================
 
 @app.get("/webhook")
 async def verify_webhook(request: Request):
-    """Paso requerido por Meta para validar el webhook"""
-    params = request.query_params
-    mode = params.get("hub.mode")
-    token = params.get("hub.verify_token")
-    challenge = params.get("hub.challenge")
+    """Verificación obligatoria del Webhook requerida por Meta for Developers"""
+    mode = request.query_params.get("hub.mode")
+    token = request.query_params.get("hub.verify_token")
+    challenge = request.query_params.get("hub.challenge")
 
     if mode == "subscribe" and token == VERIFY_TOKEN:
-        print("[OK] Webhook verificado correctamente ante Meta.")
+        print("[OK] Webhook de Meta verificado exitosamente.")
         return Response(content=challenge, media_type="text/plain", status_code=200)
 
     print("[ERROR] Fallo de validacion en Webhook de Meta.")
@@ -83,6 +82,17 @@ async def receive_webhook(request: Request):
                 for change in entry.get("changes", []):
                     value = change.get("value", {})
                     
+                    # Registrar actualizaciones de entrega/estado de Meta
+                    if "statuses" in value:
+                        for st in value["statuses"]:
+                            msg_id = st.get("id")
+                            status_name = st.get("status")
+                            recipient_id = st.get("recipient_id")
+                            errors = st.get("errors", [])
+                            print(f"[META DELIVERY STATUS] Para {recipient_id} ({msg_id}) -> {status_name}")
+                            if errors:
+                                print(f"[META DELIVERY ERROR]: {errors}")
+
                     # Extraer nombre del perfil si viene provisto por WhatsApp
                     sender_name = None
                     if "contacts" in value and len(value["contacts"]) > 0:
@@ -123,29 +133,29 @@ async def receive_webhook(request: Request):
     return JSONResponse(content={"status": "EVENT_RECEIVED"}, status_code=200)
 
 # ==========================================
-# 2. REST API PARA EL PANEL DE CONTROL
+# 2. REST API PARA EL PANEL DE CONTROL (PROTEGIDO)
 # ==========================================
 
-@app.get("/api/contacts")
+@app.get("/api/contacts", dependencies=[Depends(require_auth)])
 async def api_get_contacts():
     """Devuelve la lista ordenada de contactos y su último estado"""
     contacts = get_contacts()
     return JSONResponse(content=contacts)
 
-@app.get("/api/messages/{phone}")
+@app.get("/api/messages/{phone}", dependencies=[Depends(require_auth)])
 async def api_get_messages(phone: str):
     """Devuelve los mensajes de una conversación y marca como leídos"""
     messages = get_messages(phone)
     mark_as_read(phone)
     return JSONResponse(content=messages)
 
-@app.post("/api/toggle-bot")
+@app.post("/api/toggle-bot", dependencies=[Depends(require_auth)])
 async def api_toggle_bot(req: ToggleBotRequest):
     """Activa o pausa la IA para un número particular"""
     status_updated = toggle_bot(req.phone, req.bot_active)
     return JSONResponse(content={"phone": req.phone, "bot_active": status_updated})
 
-@app.post("/api/send-message")
+@app.post("/api/send-message", dependencies=[Depends(require_auth)])
 async def api_send_message(req: SendMessageRequest):
     """Envía un mensaje manual de operador hacia el cliente por WhatsApp"""
     if not req.text.strip():
@@ -211,7 +221,7 @@ async def api_debug_meta(phone: str):
 # 3. SPA FRONTEND (ESTILO WHATSAPP WEB)
 # ==========================================
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, dependencies=[Depends(require_auth)])
 async def serve_spa():
     html_content = """
 <!DOCTYPE html>
