@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Tuple
+from typing import Tuple, List, Dict
 from dotenv import load_dotenv
 import google.generativeai as genai
 from database import get_chat_history_for_ai
@@ -18,71 +18,50 @@ else:
     print("[WARN] GEMINI_API_KEY no configurada o usando valor por defecto. Operando con fallback inteligente.")
 
 SYSTEM_PROMPT = """
-Eres el asistente virtual oficial de Alarmas Chascomús. Tu trato es fluido, empático, profesional y con criterio técnico-comercial. Conversas de manera orgánica y natural como un asesor humano, evitando respuestas automáticas rígidas, textos enlatados o repreguntar cosas que el cliente ya mencionó. Respuestas concisas y directas (máximo 2 a 3 oraciones por intervención, salvo explicaciones técnicas paso a paso).
+Eres el asistente virtual oficial de Alarmas Chascomús ("Cuidamos lo que más querés" - Más de 20 años en Chascomús). Hablas de forma totalmente natural, fluida, empática y resolutiva.
 
 ---
 
-### IDENTIDAD BÁSICA
-- Empresa: Alarmas Chascomús ("Somos líderes en seguridad electrónica y cuidamos lo que más querés" - Más de 20 años de trayectoria en la ciudad).
-- Web oficial: https://alarmas-chascomus.vercel.app
+### REGLAS DE ORO ANTIBUCLE Y MEMORIA DE SESIÓN
+1. NUNCA repitas la misma pregunta ni des la misma respuesta que diste en el mensaje inmediatamente anterior.
+2. Si el usuario responde con una sola palabra o nombre de marca/app (ej. "Imou life", "Imou", "Garnet", "DSC", "Cámaras", "Hikvision", "Dahua"):
+   - Revisa de qué venían hablando en los mensajes anteriores.
+   - NO vuelvas a preguntar la marca o modelo.
+   - Toma esa marca y dale DIRECTAMENTE la solución paso a paso de usuario final.
+3. Si el usuario dice "cambié de teléfono" y menciona la app (ej. Imou Life, DMSS, Hik-Connect, Garnet Control):
+   - Explícale directo: solo debe descargar la app oficial desde Play Store/App Store, iniciar sesión con el mismo correo/usuario y contraseña con los que la creó originalmente, y las cámaras/alarmas aparecerán vinculadas de forma automática.
+   - Si no recuerda la contraseña, guíalo a usar la opción "¿Olvidaste tu contraseña?" de la aplicación.
 
 ---
 
-### PROCESAMIENTO ACTIVO Y COMPRENSIÓN DE CONTEXTO
+### ALCANCE Y CONOCIMIENTO DE USUARIO FINAL
 
-1. Escucha activa (No repreguntar lo obvio):
-   - Antes de responder, analiza detalladamente el mensaje del usuario y extrae toda la información ya provista (tipo de propiedad, modelo/marca de alarma o cámara, problema específico, ubicación, etc.).
-   - NUNCA vuelvas a preguntar un dato que el cliente ya haya expresado en su mensaje (ej. si el cliente dice "necesito colocar una alarma en una casa quinta", no preguntes "¿qué tipo de propiedad tenés?").
-   - Reconoce y valida lo que dijo de forma natural (ej. "Excelente, para la casa quinta...") y avanza con el siguiente paso lógico.
+Marcas soportadas:
+- Alarmas: DSC PowerSeries, Garnet/Alonso, Intelbras, X-28.
+- Cámaras/Apps: Imou (Imou Life), Dahua (DMSS), Hikvision (Hik-Connect).
 
-2. Criterio de conversación adaptativo:
-   - Si el cliente da información completa en su primer mensaje, responde directamente a su solicitud sin rodeos ni preguntas redundantes.
-   - Si la solicitud es ambigua o falta un dato clave (ej. qué modelo de central tiene para un cambio de clave), solicita solo ese dato faltante.
+Soporte permitido (Nivel Usuario):
+- Descarga, inicio de sesión y visualización en apps móviles.
+- Armado/desarmado (Stay/Away), cambio de claves de usuario común, anulación temporal de zonas, test de sirena de usuario y lectura de fallas básicas.
 
----
-
-### ALCANCE MULTIMARCA Y CONOCIMIENTO EXCLUSIVO DE USUARIO FINAL
-
-Tu conocimiento abarca el uso residencial y comercial de:
-- Alarmas: Garnet / Alonso, DSC PowerSeries, Intelbras (AMT/ANM), X-28.
-- Cámaras y Video: Dahua, Hikvision, Imou.
-- Apps de usuario: Garnet Control, Lantrix Remote, Intelbras AMT Móvil, X-28 Home, Hik-Connect, Imou Life, DMSS.
-
-1. Soporte Permitido (Operativa Básica de Usuario):
-   - Alarmas: Armado/desarmado (modos Presente/Stay, Ausente/Away), gestión de claves de usuario desde teclado/app, anulación/bypass temporal de zonas abiertas, ajuste de hora/fecha, consulta de memoria de alarmas y lectura de fallas básicas.
-   - Cámaras / Apps: Ver en vivo, compartir vista de cámaras en apps oficiales o verificar conexión de red/nube.
-
-2. Límites Estrictos y Priorización del Servicio Técnico (PROHIBIDO al usuario):
-   - NUNCA entregues códigos de instalador/ingeniería, pasos de programación avanzada de zonas, apertura física de paneles ni conexionado de borneras.
-   - Si la consulta implica manipulación física, riesgo de desconfigurar la central, dudas en la maniobra, o requiere service: aconseja cordialmente que el trabajo lo realice un técnico especializado para preservar la seguridad y la garantía del sistema.
-   - Ofrece coordinar servicio técnico llamando al 2241-527180.
+Límites estrictos (Técnico Especializado):
+- NUNCA des claves de instalador/técnico, configuración avanzada de router/red ni manipulación de borneras/placas.
+- Si el cliente requiere reconfigurar la cámara desde cero a un nuevo router Wi-Fi o resetear el equipo físico y se le dificulta, aconseja la visita de un técnico especializado y ofrece el contacto: 2241-527180.
 
 ---
 
-### PROTOCOLO POR INTENCIÓN
+### PROTOCOLO SEGÚN INTENCIÓN
 
-1. Saludos Iniciales:
-   - Responde con calidez y naturalidad presentándote brevemente si es el primer contacto.
-   - Si el saludo ya vino acompañado de una consulta concreta, responde a la consulta de inmediato sin demoras ceremoniales.
-
-2. Consultas Técnicas / Operativas:
-   - Si ya indicó la marca/modelo, brinda los pasos de usuario directamente. Si no la indicó, pregunta solo la marca/modelo de su teclado o app.
-   - No envíes formularios comerciales para resolver dudas técnicas.
-
-3. Nuevas Instalaciones y Cotizaciones (Comercial):
-   - Aplica ÚNICAMENTE cuando se busca equipar una propiedad o cotizar equipos nuevos.
-   - Si ya describió el inmueble (ej. "tengo una quinta"), valida la necesidad y proporciona el enlace de relevamiento para coordinar la visita y presupuesto sin cargo:
+1. Ventas / Nuevas Instalaciones:
+   - Solo si el cliente busca instalar un sistema nuevo o cotizar una propiedad.
+   - Conversa sobre la necesidad y brinda el formulario de relevamiento:
      🔗 https://forms.gle/xpRAs7XkrZUertkn8
-   - Si solo preguntó en general sin detalles (ej. "¿Instalan alarmas?"), pregunta por el tipo de propiedad antes de enviar el formulario.
 
-4. Urgencias Críticas:
-   - Únicamente ante sirenas sonando de forma ininterrumpida o averías graves del sistema: derivar de inmediato a 2241-527180 (Principal) / 2241-527357.
+2. Consultas Técnicas / Apps:
+   - Responde la duda técnica directamente. Prohibido enviar el formulario de presupuestos en consultas técnicas.
 
-5. Formas de Pago:
-   - Informa brevemente sobre las opciones en cuotas con tarjeta, coordinando el plan exacto con el técnico al presupuestar.
-
-6. Cierres:
-   - Despídete formal y cordialmente sin adjuntar enlaces innecesarios.
+3. Urgencias Críticas:
+   - Solo ante sirenas sonando sin control o fallas graves del sistema: derivar a 2241-527180 (Principal) / 2241-527357.
 
 ---
 
@@ -106,65 +85,130 @@ if is_gemini_configured():
 
 DERIVATION_FLAG = "[DERIVAR_HUMANO]"
 
-def _simulate_smart_ai_reply(user_message: str) -> Tuple[str, bool]:
-    """Generador heurístico en caso de fallback"""
-    lower = user_message.lower()
+def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> Tuple[str, bool]:
+    """Generador experto con memoria contextual completa para contingencia"""
+    lower = user_message.lower().strip()
+    
+    # Combinar historial reciente para análisis contextual
+    past_text = ""
+    if history:
+        for item in history[-4:]:
+            past_text += " " + item.get("parts", [""])[0].lower()
+    
+    full_context = (past_text + " " + lower).strip()
 
+    # 1. Urgencias
     if any(k in lower for k in ["sonando", "urgente", "emergencia", "rotura", "caido", "caído", "disparada"]):
         reply = (
             "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o al 2241-527357."
         )
         return reply, True
 
-    if any(k in lower for k in ["codigo", "código", "instalador", "ingenieria", "placa", "programacion"]):
+    # 2. Seguridad estricta
+    if any(k in lower for k in ["codigo instalador", "código instalador", "ingenieria", "placa", "programacion de zona"]):
         reply = (
-            "Por normas estrictas de seguridad, los códigos de instalador y la programación de placa son de acceso exclusivo del servicio técnico homologado. "
+            "Por normas estrictas de seguridad, los códigos de instalador y la programación interna son de acceso exclusivo del servicio técnico homologado. "
             "Podemos coordinar una visita técnica oficial al 2241-527180."
         )
         return reply, False
 
-    if any(k in lower for k in ["app", "dahua", "hikvision", "imou", "dmss", "hik-connect", "garnet", "alonso", "intelbras", "x28", "x-28"]):
+    # 3. Imou / Imou Life (antibucle contextual)
+    if "imou" in lower or ("imou" in full_context and any(k in full_context for k in ["camara", "cámara", "app", "tel", "cel"])):
         reply = (
-            "¡Con gusto te ayudamos! Para darte los pasos exactos de usuario, ¿qué marca y modelo específico de panel, cámara o aplicación estás utilizando?"
+            "¡Hola! Para configurar tu cámara en un teléfono nuevo con la app **Imou Life**:\n\n"
+            "1. Descargá la app **Imou Life** en tu nuevo celular desde Play Store o App Store.\n"
+            "2. Iniciá sesión con el **mismo correo electrónico y contraseña** con los que creaste tu cuenta originalmente. Al ingresar, tus cámaras aparecerán vinculadas de forma automática.\n"
+            "3. Si no recordás la clave, usá la opción *'¿Olvidaste tu contraseña?'* para restablecerla por email.\n\n"
+            "¿Pudiste iniciar sesión o necesitás vincularla desde cero escaneando el código QR de la cámara?"
         )
         return reply, False
 
-    if any(k in lower for k in ["quinta", "casa", "comercio", "negocio", "galpon", "galpón", "obra"]):
+    # 4. Hikvision / Hik-Connect (antibucle contextual)
+    if any(k in lower for k in ["hik-connect", "hikconnect", "hikvision"]) or "hik" in full_context:
         reply = (
-            "¡Excelente! Diseñamos sistemas de seguridad y CCTV a medida con presupuestos 100% sin cargo. "
-            "Para coordinar la evaluación técnica, por favor completá este formulario así te contactamos: https://forms.gle/xpRAs7XkrZUertkn8"
+            "Para configurar **Hik-Connect** en tu nuevo celular:\n\n"
+            "1. Descargá la app **Hik-Connect** e iniciá sesión con tu cuenta registrada (correo o usuario).\n"
+            "2. Tus cámaras se sincronizarán solas. Si te solicita el código de verificación/cifrado, se encuentra en la etiqueta de la cámara o grabador.\n\n"
+            "¿Pudiste ingresar con tu cuenta?"
         )
         return reply, False
 
-    if any(k in lower for k in ["camara", "cámara", "alarma", "servicio", "instalan", "precio", "presupuesto", "cotiz"]):
+    # 5. Dahua / DMSS (antibucle contextual)
+    if any(k in lower for k in ["dmss", "dahua"]) or "dmss" in full_context or "dahua" in full_context:
         reply = (
-            "¡Sí, claro! En Alarmas Chascomús realizamos instalaciones y mantenimiento de sistemas de alarmas y cámaras de seguridad. "
-            "¿Qué tipo de propiedad estás buscando proteger (casa, comercio, quinta u obra)?"
+            "Para configurar la app **DMSS (Dahua)** en tu nuevo teléfono:\n\n"
+            "1. Instalá **DMSS** desde la tienda de aplicaciones.\n"
+            "2. Iniciá sesión con tu cuenta de DMSS para que se carguen tus dispositivos en la nube, o agregá el equipo escaneando el código QR.\n\n"
+            "¿Pudiste ingresar a tu cuenta?"
         )
         return reply, False
 
-    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos"]):
+    # 6. Garnet / Alonso (Garnet Control / Lantrix)
+    if any(k in lower for k in ["garnet", "alonso", "lantrix"]) or "garnet" in full_context:
+        reply = (
+            "Para la app **Garnet Control / Lantrix** en tu celular nuevo:\n\n"
+            "1. Descargá la app oficial desde la tienda de aplicaciones.\n"
+            "2. Ingresá tu usuario y contraseña habituales para acceder al estado de tu alarma y recibir los avisos de armado/desarmado."
+        )
+        return reply, False
+
+    # 7. DSC PowerSeries
+    if "dsc" in lower or "dsc" in full_context:
+        reply = (
+            "Para paneles DSC:\n"
+            "- Cambiar clave de usuario: `[*][5] + Código Maestro + N° de usuario (01 a 32) + Nueva clave + [#]`.\n"
+            "- Ver fallas en teclado: `[*][2]`.\n"
+            "- Anular zona: `[*][1] + N° de zona`."
+        )
+        return reply, False
+
+    # 8. X-28
+    if any(k in lower for k in ["x28", "x-28"]) or "x28" in full_context or "x-28" in full_context:
+        reply = (
+            "Para sistemas X-28 podés gestionar tu sistema desde el teclado o mediante la app **X-28 Home** iniciando sesión con tu cuenta registrada."
+        )
+        return reply, False
+
+    # 9. Cambio de teléfono general sin marca aún
+    if any(k in lower for k in ["cambie de tel", "cambié de tel", "cambie de cel", "cambié de cel", "nuevo telefono", "nuevo teléfono"]):
+        reply = (
+            "¡Hola! Para recuperar tus cámaras en el celular nuevo, solo tenés que descargar la app correspondiente (Imou Life, DMSS, Hik-Connect) e iniciar sesión con tu cuenta habitual (correo y contraseña). "
+            "¿Qué aplicación o marca de cámaras utilizás?"
+        )
+        return reply, False
+
+    # 10. Presupuestos y nuevas instalaciones
+    if any(k in lower for k in ["quinta", "casa", "comercio", "negocio", "galpon", "galpón", "obra", "local", "presupuesto", "cotiz"]):
+        reply = (
+            "¡Excelente! Diseñamos sistemas de seguridad y cámaras a medida con presupuestos 100% sin cargo. "
+            "Para coordinar la evaluación técnica, por favor completá este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8"
+        )
+        return reply, False
+
+    # 11. Despedidas
+    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos", "muchas gracias"]):
         reply = (
             "¡Muchas gracias a vos! Quedamos a disposición en Alarmas Chascomús para lo que necesites. ¡Que tengas un excelente día!"
         )
         return reply, False
 
+    # 12. Saludos por defecto
     reply = (
-        "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo ayudar hoy?"
+        "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano hoy?"
     )
     return reply, False
 
 def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
     """
-    Genera la respuesta con Gemini con escucha activa, contexto inteligente y cero repreguntas obvias.
+    Genera la respuesta contextual con Gemini o el motor antibucle con memoria de sesión.
     Devuelve (texto_limpio, debe_derivar_a_guardia).
     """
+    raw_history = get_chat_history_for_ai(phone, limit=8)
+    
     if not is_gemini_configured() or model is None:
-        return _simulate_smart_ai_reply(user_message)
+        return _simulate_smart_ai_reply(user_message, raw_history)
 
     try:
-        raw_history = get_chat_history_for_ai(phone, limit=8)
-        
         formatted_history = []
         last_role = None
         for item in raw_history:
@@ -188,5 +232,5 @@ def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
         return clean_reply, should_derive
 
     except Exception as e:
-        print(f"[ERROR] Error al consultar Gemini: {e}")
-        return _simulate_smart_ai_reply(user_message)
+        print(f"[ERROR] Error al consultar Gemini ({e}). Aplicando motor experto con memoria de sesión.")
+        return _simulate_smart_ai_reply(user_message, raw_history)
