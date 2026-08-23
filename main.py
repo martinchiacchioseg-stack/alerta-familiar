@@ -174,15 +174,16 @@ async def api_debug_meta(phone: str):
     """Diagnóstico en vivo para probar el envío y ver el error exacto de Meta"""
     import httpx
     load_dotenv(override=True)
-    token = os.getenv("META_ACCESS_TOKEN", "")
-    phone_id = os.getenv("PHONE_NUMBER_ID", "")
+    token = os.getenv("META_ACCESS_TOKEN", "").strip()
+    phone_id = os.getenv("PHONE_NUMBER_ID", "").strip()
+    clean_phone = str(phone).strip().replace("+", "").replace(" ", "").replace("-", "")
     
     debug_info = {
         "token_configured": bool(token and token != "PEGA_AQUI_TU_META_ACCESS_TOKEN"),
         "token_prefix": token[:10] if token else "None",
         "token_length": len(token) if token else 0,
         "phone_id": phone_id,
-        "target_phone": phone
+        "target_phone": clean_phone
     }
     
     if not token or not phone_id or token == "PEGA_AQUI_TU_META_ACCESS_TOKEN" or phone_id == "PEGA_AQUI_TU_PHONE_NUMBER_ID":
@@ -196,7 +197,7 @@ async def api_debug_meta(phone: str):
     payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": str(phone),
+        "to": clean_phone,
         "type": "text",
         "text": {"preview_url": False, "body": "Prueba de conexion directa desde Render a WhatsApp"}
     }

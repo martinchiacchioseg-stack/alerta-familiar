@@ -4,10 +4,10 @@ import httpx
 from dotenv import load_dotenv
 
 def get_meta_credentials():
-    """Recarga y devuelve las credenciales actuales de Meta"""
+    """Recarga y devuelve las credenciales actuales de Meta sanitizadas"""
     load_dotenv(override=True)
-    token = os.getenv("META_ACCESS_TOKEN", "")
-    phone_id = os.getenv("PHONE_NUMBER_ID", "")
+    token = os.getenv("META_ACCESS_TOKEN", "").strip()
+    phone_id = os.getenv("PHONE_NUMBER_ID", "").strip()
     return token, phone_id
 
 def is_meta_configured() -> bool:
@@ -32,6 +32,9 @@ async def send_whatsapp_message(to_phone: str, text: str) -> bool:
         print(f"Texto: \"{text}\"\n")
         return True
 
+    # Limpiar formato de teléfono
+    clean_phone = str(to_phone).strip().replace("+", "").replace(" ", "").replace("-", "")
+
     graph_url = f"https://graph.facebook.com/v20.0/{phone_id}/messages"
     headers = {
         "Authorization": f"Bearer {token}",
@@ -41,7 +44,7 @@ async def send_whatsapp_message(to_phone: str, text: str) -> bool:
     payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": str(to_phone),
+        "to": clean_phone,
         "type": "text",
         "text": {
             "preview_url": False,

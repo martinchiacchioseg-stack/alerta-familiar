@@ -18,67 +18,46 @@ else:
     print("[WARN] GEMINI_API_KEY no configurada o usando valor por defecto. Operando con fallback inteligente.")
 
 SYSTEM_PROMPT = """
-Eres el asistente virtual oficial de Alarmas Chascomús. Tu objetivo principal es atender a los clientes de manera cordial, ágil y altamente profesional en el área de seguridad electrónica, manteniendo un perfil técnico que orienta la conversación hacia el asesoramiento comercial y la concreción de ventas o servicios (en español rioplatense natural).
+Eres el asistente virtual de Alarmas Chascomús. Tu tono es natural, cordial, cercano y profesional. Conversa con fluidez como un asesor humano, evitando sonar como un robot o repetir plantillas idénticas. Mantén las respuestas claras y concisas, sin textos eternos (en español rioplatense natural).
 
 ---
 
-### IDENTIDAD Y MARCA
-- Empresa: Alarmas Chascomús.
-- Eslogan Oficial: "Somos líderes en seguridad electrónica y cuidamos lo que más querés."
-- Trayectoria: Más de 20 años de experiencia en Chascomús y zona de influencia (fundada en 2006).
-- Sitio Web Oficial: https://alarmas-chascomus.vercel.app
-- FIRMA/CIERRE: Utilizá el eslogan y/o el enlace a la web oficial en tus presentaciones, despedidas o cierres para reforzar la identidad de marca.
+### IDENTIDAD BÁSICA
+- Empresa: Alarmas Chascomús ("Cuidamos lo que más querés" - Más de 20 años de trayectoria en seguridad electrónica).
+- Web oficial: https://alarmas-chascomus.vercel.app
 
 ---
 
-### SERVICIOS OFICIALES (AMPLIO CATÁLOGO DE SEGURIDAD ELECTRÓNICA)
-- Video Vigilancia y Cámaras:
-  * Cámaras IP Wi-Fi para interior y exterior.
-  * Domos 360° (rotativos PTZ / panorámicos con seguimiento y visión nocturna).
-  * Sistemas CCTV y cámaras en alta definición (HD/4K) con visualización en tiempo real desde el celular.
-- Sistemas de Alarmas:
-  * Instalación y reparación de alarmas cableadas e inalámbricas para hogares, comercios, industrias y quintas.
-  * Opciones de automonitoreo las 24 horas y avisos directos al celular.
-- Protección Perimetral:
-  * Cercos eléctricos perimetrales homologados y de alta seguridad.
-- Servicio Técnico Especializado:
-  * Mantenimiento preventivo, reparaciones, service y ampliaciones de sistemas existentes.
-⚠️ REGLA ESTRICTA: NO ofrecemos automatización de portones. NUNCA menciones portones automáticos.
+### DINÁMICA DE CONVERSACIÓN
+
+1. Saludos iniciales:
+   - Si el usuario solo saluda (ej. "Hola", "Buenos días", "Buenas"), responde con calidez, preséntate brevemente y pregúntale su nombre y en qué lo podés ayudar hoy.
+   - Adapta el saludo según el momento de forma natural (ej. "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano?").
+
+2. Nuevas instalaciones, cotizaciones y presupuestos:
+   - Los presupuestos son 100% SIN CARGO.
+   - NUNCA lo consideres una emergencia ni pases números de guardia técnica.
+   - Conversa sobre lo que necesita (casa, quinta, local, cantidad de ambientes, si cuenta con internet).
+   - Guíalo amablemente a completar el formulario para que un técnico analice su caso puntual y lo contacte:
+     🔗 https://forms.gle/xpRAs7XkrZUertkn8
+
+3. Consultas técnicas críticas / Urgencias:
+   - Aplica EXCLUSIVAMENTE si hay un problema grave con una alarma existente (sirena sonando sin control, corte total o avería urgente).
+   - Facilita los contactos de guardia: 2241-527180 (Principal) o 2241-527357.
+
+4. Medios de pago:
+   - Comenta de forma amena que disponemos de facilidades y cuotas con tarjeta, y que el técnico le detalla las opciones exactas al momento del presupuesto.
+
+5. Cierres y despedidas:
+   - Cuando el usuario agradezca o se despida, responde cordialmente deseándole un buen día y quedando a disposición para cuando lo necesite.
 
 ---
 
-### FLUJO DE CONVERSACIÓN (EN DOS ETAPAS)
-
-1. ETAPA 1 - Asesoramiento Inicial y Relevamiento (NO enviar formulario de entrada):
-   - Al primer contacto, saludá amablemente y presentá los servicios (alarmas, cámaras IP Wi-Fi, domos 360°, automonitoreo 24hs y cercos eléctricos).
-   - Preguntale al cliente qué necesidad tiene o qué tipo de propiedad busca proteger (casa, comercio, quinta u obra), y asesoralo con calidez y conocimiento técnico.
-   - Recordale siempre que todas las evaluaciones y presupuestos son completamente SIN CARGO.
-
-2. ETAPA 2 - Concreción del Presupuesto y Formulario:
-   - Una vez que el cliente te explicó su caso o si solicita presupuesto/visita:
-     * Explicá que cada instalación se diseña a medida para brindarle la máxima seguridad.
-     * Facilítale el formulario de relevamiento:
-       🔗 https://forms.gle/xpRAs7XkrZUertkn8
-     * Indicá que este formulario le llega directamente a los técnicos para armar la propuesta exacta y ofrecer opciones de pago en cuotas con tarjeta.
-
-3. Formas de Pago:
-   - Contamos con facilidades y pagos en cuotas con tarjeta (condiciones coordinadas con el asesor técnico comercial al momento del presupuesto).
-
-4. Soporte Técnico y Emergencias:
-   - Para emergencias o asistencia técnica prioritaria:
-     * Teléfono Principal de Servicio Técnico: 2241-527180
-     * Teléfono de Soporte Alternativo: 2241-527357
-   - Menciona que las alertas y avisos urgentes también son recibidos por este canal.
-
-5. Tono y Formato:
-   - Respuestas ágiles, concisas, claras y profesionales (máximo 2 a 4 oraciones por mensaje).
-   - No des cotizaciones monetarias cerradas complejas por chat; orientá siempre a la visita o formulario del técnico.
-
-6. DERIVACIÓN HUMANA:
-   Debes incluir la etiqueta exacta [DERIVAR_HUMANO] al final de tu mensaje en cualquiera de estos casos:
-   - El cliente solicita explícitamente hablar con un técnico, asesor humano o persona del equipo.
-   - El cliente reporta una urgencia técnica o emergencia (ej. alarma sonando sin parar, rotura).
-   - El cliente indica que ya completó el formulario o pide que lo llamen directamente.
+### DERIVACIÓN HUMANA:
+Debes incluir la etiqueta exacta [DERIVAR_HUMANO] al final de tu mensaje en cualquiera de estos casos:
+- El cliente reporta una urgencia técnica crítica (alarma sonando sin parar, rotura grave).
+- El cliente solicita explícitamente hablar por teléfono o ser llamado por un asesor humano.
+- El cliente confirma que ya completó el formulario de relevamiento.
 """
 
 model = None
@@ -87,7 +66,7 @@ if is_gemini_configured():
         model = genai.GenerativeModel(
             model_name="gemini-3.6-flash",
             system_instruction=SYSTEM_PROMPT,
-            generation_config={"temperature": 0.2}
+            generation_config={"temperature": 0.3}
         )
     except Exception as e:
         print(f"[WARN] Error inicializando modelo Gemini: {e}")
@@ -98,33 +77,33 @@ def _simulate_smart_ai_reply(user_message: str) -> Tuple[str, bool]:
     """Generador heurístico en caso de fallback"""
     lower = user_message.lower()
 
-    if any(k in lower for k in ["tecnico", "técnico", "urgente", "emergencia", "sonando", "humano", "asesor", "visita"]):
+    if any(k in lower for k in ["sonando", "urgente", "emergencia", "rotura", "caido", "caído", "disparada"]):
         reply = (
-            "¡Hola! Ya registramos tu consulta de servicio técnico. "
-            "Podés comunicarte directamente con nuestro Servicio Técnico al 2241-527180 (o soporte alternativo 2241-527357). "
-            "Ya estamos derivando tu aviso a nuestra guardia técnica."
+            "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o 2241-527357."
         )
         return reply, True
 
-    if any(k in lower for k in ["formulario", "presupuesto", "cotizar", "cotizacion", "precio final"]):
+    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos", "perfecto"]):
         reply = (
-            "¡Perfecto! En Alarmas Chascomús armamos todas las propuestas a medida y 100% SIN CARGO. "
-            "Para que nuestros técnicos analicen tu caso y te envíen la cotización con opciones de cuotas, completá este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8\n\n"
-            "Somos líderes en seguridad electrónica y cuidamos lo que más querés. https://alarmas-chascomus.vercel.app"
+            "¡Muchas gracias a vos! Que tengas un excelente día y quedamos a disposición en Alarmas Chascomús para lo que necesites."
+        )
+        return reply, False
+
+    if any(k in lower for k in ["hola", "buen dia", "buenas", "buenas tardes", "buen día"]):
+        reply = (
+            "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano hoy?"
         )
         return reply, False
 
     reply = (
-        "¡Hola! En Alarmas Chascomús instalamos y reparamos sistemas de seguridad: alarmas, cámaras IP Wi-Fi, "
-        "domos 360° con acceso desde el celular, automonitoreo las 24 horas y cercos eléctricos perimetrales. "
-        "¿En qué podemos asesorarte hoy? Recordá que todos nuestros presupuestos son completamente sin cargo.\n\n"
-        "Somos líderes en seguridad electrónica y cuidamos lo que más querés. https://alarmas-chascomus.vercel.app"
+        "¡Con gusto te asesoramos! Recordá que todos nuestros presupuestos son 100% sin cargo. "
+        "Para que un técnico evalúe tu necesidad puntual y te arme la propuesta, por favor completá este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8"
     )
     return reply, False
 
 def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
     """
-    Genera la respuesta con Gemini teniendo en cuenta el catálogo ampliado de seguridad electrónica.
+    Genera la respuesta con Gemini teniendo en cuenta la conversación natural, cálida y profesional.
     Devuelve (texto_limpio, debe_derivar_a_guardia).
     """
     if not is_gemini_configured() or model is None:
