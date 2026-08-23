@@ -23,14 +23,15 @@ Eres el asistente virtual oficial de Alarmas Chascomús ("Cuidamos lo que más q
 ---
 
 ### REGLAS DE ORO ANTIBUCLE Y MEMORIA DE SESIÓN
-1. NUNCA repitas la misma pregunta ni des la misma respuesta que diste en el mensaje inmediatamente anterior.
-2. Si el usuario responde con una sola palabra o nombre de marca/app (ej. "Imou life", "Imou", "Garnet", "DSC", "Cámaras", "Hikvision", "Dahua"):
-   - Revisa de qué venían hablando en los mensajes anteriores.
-   - NO vuelvas a preguntar la marca o modelo.
-   - Toma esa marca y dale DIRECTAMENTE la solución paso a paso de usuario final.
-3. Si el usuario dice "cambié de teléfono" y menciona la app (ej. Imou Life, DMSS, Hik-Connect, Garnet Control):
-   - Explícale directo: solo debe descargar la app oficial desde Play Store/App Store, iniciar sesión con el mismo correo/usuario y contraseña con los que la creó originalmente, y las cámaras/alarmas aparecerán vinculadas de forma automática.
-   - Si no recuerda la contraseña, guíalo a usar la opción "¿Olvidaste tu contraseña?" de la aplicación.
+1. NUNCA repitas el saludo inicial ("¡Hola! Buen día...") si la conversación ya está iniciada.
+2. Si el usuario ya mencionó su nombre (ej. "Soy Martín") o su necesidad (ej. "ayuda con mi cámara", "cambié de teléfono", "no puedo ver mi cámara"):
+   - Valida de inmediato su nombre y necesidad: "¡Hola Martín! Con gusto te ayudo a recuperar la vista de tus cámaras."
+   - Pregunta SOLO la marca o aplicación que utiliza (ej. Imou Life, DMSS, Hik-Connect) si aún no la mencionó.
+3. Si el usuario menciona la marca o app (ej. "Imou", "Imou life", "DMSS", "Hik-Connect"):
+   - Dale DIRECTAMENTE la solución paso a paso de usuario final:
+     * Descargar la app en el celular nuevo desde la tienda.
+     * Iniciar sesión con su correo y contraseña habituales (las cámaras aparecen solas).
+     * Usar '¿Olvidaste tu contraseña?' si no recuerda la clave.
 
 ---
 
@@ -86,13 +87,16 @@ if is_gemini_configured():
 DERIVATION_FLAG = "[DERIVAR_HUMANO]"
 
 def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> Tuple[str, bool]:
-    """Generador experto con memoria contextual completa para contingencia"""
+    """Generador experto contextual inteligente (sin saludos en bucle)"""
     lower = user_message.lower().strip()
     
-    # Combinar historial reciente para análisis contextual
+    # Analizar si ya hubo mensajes previos
+    has_history = bool(history and len(history) > 1)
+    
+    # Extraer todo el contexto previo
     past_text = ""
     if history:
-        for item in history[-4:]:
+        for item in history:
             past_text += " " + item.get("parts", [""])[0].lower()
     
     full_context = (past_text + " " + lower).strip()
@@ -112,18 +116,18 @@ def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> T
         )
         return reply, False
 
-    # 3. Imou / Imou Life (antibucle contextual)
+    # 3. Soporte Imou / Imou Life
     if "imou" in lower or ("imou" in full_context and any(k in full_context for k in ["camara", "cámara", "app", "tel", "cel"])):
         reply = (
-            "¡Hola! Para configurar tu cámara en un teléfono nuevo con la app **Imou Life**:\n\n"
-            "1. Descargá la app **Imou Life** en tu nuevo celular desde Play Store o App Store.\n"
-            "2. Iniciá sesión con el **mismo correo electrónico y contraseña** con los que creaste tu cuenta originalmente. Al ingresar, tus cámaras aparecerán vinculadas de forma automática.\n"
-            "3. Si no recordás la clave, usá la opción *'¿Olvidaste tu contraseña?'* para restablecerla por email.\n\n"
-            "¿Pudiste iniciar sesión o necesitás vincularla desde cero escaneando el código QR de la cámara?"
+            "¡Perfecto! Para configurar tu cámara en un teléfono nuevo con la app **Imou Life**:\n\n"
+            "1. Descargá la app **Imou Life** en tu celular nuevo desde Play Store o App Store.\n"
+            "2. Iniciá sesión con el **mismo correo y contraseña** que usabas antes (las cámaras se cargan solas).\n"
+            "3. Si no recordás la clave, usá la opción *'¿Olvidaste tu contraseña?'* en la app.\n\n"
+            "¿Pudiste iniciar sesión correctamente?"
         )
         return reply, False
 
-    # 4. Hikvision / Hik-Connect (antibucle contextual)
+    # 4. Soporte Hikvision / Hik-Connect
     if any(k in lower for k in ["hik-connect", "hikconnect", "hikvision"]) or "hik" in full_context:
         reply = (
             "Para configurar **Hik-Connect** en tu nuevo celular:\n\n"
@@ -133,7 +137,7 @@ def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> T
         )
         return reply, False
 
-    # 5. Dahua / DMSS (antibucle contextual)
+    # 5. Soporte Dahua / DMSS
     if any(k in lower for k in ["dmss", "dahua"]) or "dmss" in full_context or "dahua" in full_context:
         reply = (
             "Para configurar la app **DMSS (Dahua)** en tu nuevo teléfono:\n\n"
@@ -143,41 +147,26 @@ def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> T
         )
         return reply, False
 
-    # 6. Garnet / Alonso (Garnet Control / Lantrix)
-    if any(k in lower for k in ["garnet", "alonso", "lantrix"]) or "garnet" in full_context:
+    # 6. Cambio de teléfono / ayuda con cámaras (cuando aún no nombró la app)
+    if any(k in full_context for k in ["cambie de tel", "cambié de tel", "cambio de telefono", "cambio de teléfono", "cambie de cel", "cambié de cel", "nuevo telefono", "nuevo teléfono", "ayuda con mi camara", "ayuda con mi cámara", "no puedo ver mi camara", "no puedo ver mi cámara"]):
+        name_match = re.search(r'\bsoy\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)', lower)
+        name_str = f" {name_match.group(1).capitalize()}" if name_match else ""
+        
         reply = (
-            "Para la app **Garnet Control / Lantrix** en tu celular nuevo:\n\n"
-            "1. Descargá la app oficial desde la tienda de aplicaciones.\n"
-            "2. Ingresá tu usuario y contraseña habituales para acceder al estado de tu alarma y recibir los avisos de armado/desarmado."
+            f"¡Hola{name_str}! Con gusto te ayudo a recuperar la vista de tus cámaras en el celular nuevo. "
+            "Para darte el paso a paso exacto, ¿qué aplicación o marca de cámaras utilizás (por ejemplo Imou Life, DMSS de Dahua o Hik-Connect)?"
         )
         return reply, False
 
-    # 7. DSC PowerSeries
-    if "dsc" in lower or "dsc" in full_context:
+    # 7. Si el usuario solo dijo su nombre
+    if lower.startswith("soy ") or (len(lower.split()) <= 2 and any(k in full_context for k in ["camara", "cámara"])):
+        clean_name = user_message.replace("Soy", "").replace("soy", "").strip().capitalize()
         reply = (
-            "Para paneles DSC:\n"
-            "- Cambiar clave de usuario: `[*][5] + Código Maestro + N° de usuario (01 a 32) + Nueva clave + [#]`.\n"
-            "- Ver fallas en teclado: `[*][2]`.\n"
-            "- Anular zona: `[*][1] + N° de zona`."
+            f"¡Hola {clean_name}! Contame, ¿qué marca de cámaras o qué aplicación tenés instalada (Imou Life, DMSS, Hik-Connect, etc.) así te guío a configurarla?"
         )
         return reply, False
 
-    # 8. X-28
-    if any(k in lower for k in ["x28", "x-28"]) or "x28" in full_context or "x-28" in full_context:
-        reply = (
-            "Para sistemas X-28 podés gestionar tu sistema desde el teclado o mediante la app **X-28 Home** iniciando sesión con tu cuenta registrada."
-        )
-        return reply, False
-
-    # 9. Cambio de teléfono general sin marca aún
-    if any(k in lower for k in ["cambie de tel", "cambié de tel", "cambie de cel", "cambié de cel", "nuevo telefono", "nuevo teléfono"]):
-        reply = (
-            "¡Hola! Para recuperar tus cámaras en el celular nuevo, solo tenés que descargar la app correspondiente (Imou Life, DMSS, Hik-Connect) e iniciar sesión con tu cuenta habitual (correo y contraseña). "
-            "¿Qué aplicación o marca de cámaras utilizás?"
-        )
-        return reply, False
-
-    # 10. Presupuestos y nuevas instalaciones
+    # 8. Presupuestos y nuevas instalaciones
     if any(k in lower for k in ["quinta", "casa", "comercio", "negocio", "galpon", "galpón", "obra", "local", "presupuesto", "cotiz"]):
         reply = (
             "¡Excelente! Diseñamos sistemas de seguridad y cámaras a medida con presupuestos 100% sin cargo. "
@@ -185,14 +174,21 @@ def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> T
         )
         return reply, False
 
-    # 11. Despedidas
+    # 9. Despedidas
     if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos", "muchas gracias"]):
         reply = (
             "¡Muchas gracias a vos! Quedamos a disposición en Alarmas Chascomús para lo que necesites. ¡Que tengas un excelente día!"
         )
         return reply, False
 
-    # 12. Saludos por defecto
+    # 10. Si ya hay conversación iniciada, NO repetir el saludo ceremonial
+    if has_history:
+        reply = (
+            "¿Qué marca de cámaras o sistema de alarma tenés instalado para que te indique los pasos exactos?"
+        )
+        return reply, False
+
+    # 11. Saludo inicial estándar
     reply = (
         "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano hoy?"
     )
@@ -203,7 +199,7 @@ def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
     Genera la respuesta contextual con Gemini o el motor antibucle con memoria de sesión.
     Devuelve (texto_limpio, debe_derivar_a_guardia).
     """
-    raw_history = get_chat_history_for_ai(phone, limit=8)
+    raw_history = get_chat_history_for_ai(phone, limit=10)
     
     if not is_gemini_configured() or model is None:
         return _simulate_smart_ai_reply(user_message, raw_history)
