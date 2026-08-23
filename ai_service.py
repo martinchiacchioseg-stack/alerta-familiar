@@ -15,43 +15,46 @@ def is_gemini_configured() -> bool:
 if is_gemini_configured():
     genai.configure(api_key=GEMINI_API_KEY)
 else:
-    print("[WARN] GEMINI_API_KEY no configurada o usando valor por defecto. Operando con fallback inteligente.")
+    print("[WARN] GEMINI_API_KEY no configurada o usando valor por defecto.")
 
 SYSTEM_PROMPT = """
-Eres el asistente virtual oficial de Alarmas Chascomús ("Cuidamos lo que más querés" - Más de 20 años en Chascomús). Hablas de forma totalmente natural, fluida, empática y con criterio técnico.
+Eres el asistente virtual oficial de Alarmas Chascomús ("Somos líderes en seguridad electrónica y cuidamos lo que más querés" - Más de 20 años de trayectoria).
+
+Tu objetivo es razonar libremente y conversar de forma 100% natural, humana, empática y con criterio técnico-comercial, interpretando el contexto completo de lo que el cliente te plantea.
 
 ---
 
-### DINÁMICA DE CONVERSACIÓN TÉCNICA PASO A PASO (DIAGNÓSTICO REAL)
+### TUS LÍMITES Y RESTRICCIONES OPERATIVAS (GUARDRAILS ESTRICTOS)
 
-1. NO Asumir problemas que el usuario no mencionó:
-   - Si el cliente solo dice que tiene un problema con su cámara/alarma o si solo te responde la marca/modelo (ej. "Imou", "DSC", "Garnet", "Dahua"):
-     * NUNCA dispares tutoriales específicos (como cambio de teléfono o reseteos) si el usuario no los pidió explícitamente.
-     * Valida la marca y pregúntale cuál es el problema o consulta puntual que tiene con su equipo:
-       (ej. "¡Entendido! Con tu equipo Imou, ¿qué inconveniente estás teniendo o qué necesitás hacer? ¿Es para ver en vivo, conexión, clave o alguna otra duda?").
+1. LÍMITES DE SEGURIDAD TÉCNICA (PROHIBIDO AL USUARIO):
+   - NUNCA suministres códigos maestros de instalador, códigos de ingeniería ni acceso a la placa principal/borneras.
+   - Si la consulta del cliente implica manipulación eléctrica riesgosa, cambios complejos de zonas o dudas que pongan en peligro el sistema: aconseja cordialmente la intervención de un técnico oficial y ofrece el formulario o el teléfono 2241-527180.
 
-2. Soporte Específico (Solo cuando el problema ya fue identificado):
-   - Cambio de teléfono / Nueva instalación de app: Guía para descargar la app e iniciar sesión con usuario y clave habitual.
-   - Modificación de claves de usuario: Secuencia de teclado según la marca (DSC: [*][5], Garnet, etc.).
-   - Pérdida de conexión Wi-Fi / Fuera de línea: Verificar que el router tenga internet y que la luz testigo de la cámara esté encendida.
-   - Detección de fallas en teclado: Guiar en lectura de fallas (DSC: [*][2]).
+2. DIAGNÓSTICO INTELIGENTE (NO ASUMIR PROBLEMAS):
+   - Escucha con atención: si el cliente solo te dice qué marca tiene (ej. "Imou", "Garnet", "DSC", "Dahua") o que "tiene un problema", NO asumas el problema ni le dispares tutoriales a ciegas.
+   - Pregúntale con naturalidad qué síntoma o necesidad tiene con su equipo para poder orientarlo con precisión.
 
-3. Límites Estrictos de Seguridad (Técnico Especializado):
-   - NUNCA entregues códigos de instalador/ingeniería ni guía en aperturas de centrales o borneras.
-   - Si la maniobra implica riesgo o requiere configuración compleja de router/red, ofrece coordinar la visita técnica al 2241-527180.
+3. SOPORTE TÉCNICO DE USUARIO Y DERIVACIÓN CON FORMULARIO:
+   - Puedes guiar libremente en: armado/desarmado, cambio de claves de usuario común, anulación temporal de zonas, hora/fecha, uso de apps oficiales (Imou Life, DMSS, Hik-Connect, Garnet Control, X-28 Home) e inicio de sesión en nuevo celular.
+   - Siempre que brindes una guía o ayuda técnica paso a paso, sumá amablemente al final la alternativa del formulario:
+     "En caso de no poder realizarlo o preferir que te asista un especialista, podés completar este formulario para que un técnico se comunique con vos: https://forms.gle/xpRAs7XkrZUertkn8"
 
----
+4. NUEVAS INSTALACIONES Y PRESUPUESTOS (VENTAS):
+   - Aplica cuando busca instalar un sistema nuevo o equipar una casa, quinta, comercio o empresa.
+   - Presupuestos 100% SIN CARGO.
+   - Conversa sobre la propiedad y proporciona el formulario de relevamiento:
+     🔗 https://forms.gle/xpRAs7XkrZUertkn8
 
-### NUEVAS INSTALACIONES Y PRESUPUESTOS (COMERCIAL)
-- Aplica ÚNICAMENTE si busca colocar un sistema nuevo o equipar una casa, quinta, comercio o empresa.
-- Los presupuestos son 100% SIN CARGO.
-- Conversa sobre la propiedad y facilita el formulario de relevamiento:
-  🔗 https://forms.gle/xpRAs7XkrZUertkn8
+5. URGENCIAS CRÍTICAS:
+   - Únicamente ante sirenas sonando sin parar o fallas graves del sistema: derivar a las líneas de guardia técnica 2241-527180 (Principal) / 2241-527357.
 
----
+6. REGLA DE EXCLUSIÓN:
+   - NO realizamos automatización de portones.
 
-### URGENCIAS CRÍTICAS
-- Alarma sonando sin parar o corte total: derivar de inmediato a 2241-527180 (Principal) / 2241-527357.
+7. TONO Y ESTILO:
+   - Habla en español rioplatense natural (voseo argentino).
+   - Respuestas concisas y directas.
+   - NUNCA repitas el saludo ceremonial si ya están hablando.
 
 ---
 
@@ -68,7 +71,7 @@ if is_gemini_configured():
         model = genai.GenerativeModel(
             model_name="gemini-3.6-flash",
             system_instruction=SYSTEM_PROMPT,
-            generation_config={"temperature": 0.25}
+            generation_config={"temperature": 0.4}
         )
     except Exception as e:
         print(f"[WARN] Error inicializando modelo Gemini: {e}")
@@ -76,120 +79,23 @@ if is_gemini_configured():
 DERIVATION_FLAG = "[DERIVAR_HUMANO]"
 
 def _simulate_smart_ai_reply(user_message: str, history: List[Dict] = None) -> Tuple[str, bool]:
-    """Generador contextual inteligente que indaga el problema antes de dar tutoriales"""
+    """Fallback ligero en caso de desconexión momentánea de internet o cuota de API"""
     lower = user_message.lower().strip()
     
-    # Extraer contexto previo
-    past_text = ""
-    if history:
-        for item in history:
-            past_text += " " + item.get("parts", [""])[0].lower()
-    full_context = (past_text + " " + lower).strip()
-
-    # 1. Urgencias
     if any(k in lower for k in ["sonando", "urgente", "emergencia", "rotura", "caido", "caído", "disparada"]):
-        reply = (
-            "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o al 2241-527357."
-        )
-        return reply, True
+        return "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o al 2241-527357.", True
 
-    # 2. Seguridad estricta
-    if any(k in lower for k in ["codigo instalador", "código instalador", "ingenieria", "placa", "programacion de zona"]):
-        reply = (
-            "Por normas estrictas de seguridad, los códigos de instalador y la programación interna son de acceso exclusivo del servicio técnico homologado. "
-            "Podemos coordinar una visita técnica oficial al 2241-527180."
-        )
-        return reply, False
+    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos"]):
+        return "¡Muchas gracias a vos! Quedamos a disposición en Alarmas Chascomús para lo que necesites. ¡Que tengas un excelente día!", False
 
-    # 3. Si el usuario pide explícitamente configurar en nuevo teléfono / cambio de celular
-    if any(k in full_context for k in ["cambie de tel", "cambié de tel", "cambio de telefono", "cambio de teléfono", "cambie de cel", "cambié de cel", "nuevo telefono", "nuevo teléfono"]):
-        if "imou" in full_context:
-            reply = (
-                "Para configurar tu cámara en un teléfono nuevo con la app **Imou Life**:\n\n"
-                "1. Descargá la app **Imou Life** en tu celular nuevo desde Play Store o App Store.\n"
-                "2. Iniciá sesión con el **mismo correo y contraseña** que usabas antes (las cámaras se cargan solas).\n"
-                "3. Si no recordás la clave, usá la opción *'¿Olvidaste tu contraseña?'* en la app.\n\n"
-                "¿Pudiste iniciar sesión correctamente?"
-            )
-            return reply, False
-        if any(k in full_context for k in ["hik", "hik-connect", "hikvision"]):
-            reply = (
-                "Para configurar **Hik-Connect** en tu nuevo celular:\n\n"
-                "1. Descargá la app **Hik-Connect** e iniciá sesión con tu cuenta registrada (correo o usuario).\n"
-                "2. Tus cámaras se sincronizarán solas. Si te solicita el código de verificación/cifrado, se encuentra en la etiqueta de la cámara o grabador.\n\n"
-                "¿Pudiste ingresar con tu cuenta?"
-            )
-            return reply, False
-        if any(k in full_context for k in ["dmss", "dahua"]):
-            reply = (
-                "Para configurar la app **DMSS (Dahua)** en tu nuevo teléfono:\n\n"
-                "1. Instalá **DMSS** desde la tienda de aplicaciones.\n"
-                "2. Iniciá sesión con tu cuenta de DMSS para que se carguen tus dispositivos en la nube.\n\n"
-                "¿Pudiste ingresar a tu cuenta?"
-            )
-            return reply, False
-
-    # 4. Si el usuario SOLO responde la marca (ej: 'Imou', 'Garnet', 'DSC', 'Dahua', 'Hikvision')
-    # NO asumir el problema: preguntar qué problema puntual tiene
-    brands = {
-        "imou": "Imou",
-        "hikvision": "Hikvision",
-        "hik-connect": "Hikvision",
-        "dahua": "Dahua",
-        "dmss": "Dahua",
-        "garnet": "Garnet / Alonso",
-        "alonso": "Garnet / Alonso",
-        "dsc": "DSC",
-        "intelbras": "Intelbras",
-        "x28": "X-28",
-        "x-28": "X-28"
-    }
-    for b_key, b_name in brands.items():
-        if b_key in lower and len(lower.split()) <= 4:
-            reply = (
-                f"¡Entendido! Con tu equipo {b_name}, ¿qué problema puntual estás teniendo o qué necesitás hacer? "
-                "(Por ejemplo: ver en vivo, cambio de clave, problema de conexión Wi-Fi o aviso de falla)."
-            )
-            return reply, False
-
-    # 5. Clave de usuario
-    if any(k in lower for k in ["clave", "codigo", "código", "contraseña"]) and "dsc" in full_context:
-        reply = (
-            "Para cambiar la clave de usuario en DSC:\n"
-            "1. Presioná `[*][5]`.\n"
-            "2. Ingresá tu Código Maestro actual.\n"
-            "3. Digitá el número de usuario de dos dígitos (ej. `01`).\n"
-            "4. Ingresá la nueva clave de 4 dígitos y presioná `[#]`."
-        )
-        return reply, False
-
-    # 6. Presupuestos y nuevas instalaciones
-    if any(k in lower for k in ["quinta", "casa", "comercio", "negocio", "galpon", "galpón", "obra", "local", "presupuesto", "cotiz"]):
-        reply = (
-            "¡Excelente! Diseñamos sistemas de seguridad y cámaras a medida con presupuestos 100% sin cargo. "
-            "Para coordinar la evaluación técnica, por favor completá este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8"
-        )
-        return reply, False
-
-    # 7. Despedidas
-    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos", "muchas gracias"]):
-        reply = (
-            "¡Muchas gracias a vos! Quedamos a disposición en Alarmas Chascomús para lo que necesites. ¡Que tengas un excelente día!"
-        )
-        return reply, False
-
-    # 8. Saludo inicial estándar
-    reply = (
-        "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano hoy?"
-    )
-    return reply, False
+    return "¡Hola! En Alarmas Chascomús cuidamos lo que más querés. Contanos en qué podemos asesorarte hoy (nuevas instalaciones, cámaras, alarmas o soporte técnico). Si preferís coordinar con un técnico, te dejamos nuestro formulario: https://forms.gle/xpRAs7XkrZUertkn8", False
 
 def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
     """
-    Genera la respuesta contextual con Gemini o el motor de diagnóstico real.
-    Devuelve (texto_limpio, debe_derivar_a_guardia).
+    Genera la respuesta libre y contextual con el motor de razonamiento de Gemini 3.6 Flash
+    respetando estrictamente los límites y restricciones.
     """
-    raw_history = get_chat_history_for_ai(phone, limit=10)
+    raw_history = get_chat_history_for_ai(phone, limit=12)
     
     if not is_gemini_configured() or model is None:
         return _simulate_smart_ai_reply(user_message, raw_history)
@@ -218,5 +124,5 @@ def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
         return clean_reply, should_derive
 
     except Exception as e:
-        print(f"[ERROR] Error al consultar Gemini ({e}). Aplicando motor de diagnóstico real.")
+        print(f"[ERROR] Error consultando Gemini ({e}). Usando fallback de contingencia.")
         return _simulate_smart_ai_reply(user_message, raw_history)
