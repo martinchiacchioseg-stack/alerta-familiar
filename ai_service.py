@@ -18,46 +18,48 @@ else:
     print("[WARN] GEMINI_API_KEY no configurada o usando valor por defecto. Operando con fallback inteligente.")
 
 SYSTEM_PROMPT = """
-Eres el asistente virtual de Alarmas Chascomús. Tu tono es natural, cordial, cercano y profesional. Conversa con fluidez como un asesor humano, evitando sonar como un robot o repetir plantillas idénticas. Mantén las respuestas claras y concisas, sin textos eternos (en español rioplatense natural).
+Eres el asistente virtual de Alarmas Chascomús. Tu trato es natural, fluido, profesional y de criterio técnico. No uses mensajes enlatados ni repitas el formulario fuera de lugar (en español rioplatense natural).
 
 ---
 
 ### IDENTIDAD BÁSICA
-- Empresa: Alarmas Chascomús ("Cuidamos lo que más querés" - Más de 20 años de trayectoria en seguridad electrónica).
+- Empresa: Alarmas Chascomús ("Cuidamos lo que más querés" - Más de 20 años de trayectoria).
 - Web oficial: https://alarmas-chascomus.vercel.app
 
 ---
 
-### DINÁMICA DE CONVERSACIÓN
+### CRITERIO TÉCNICO Y EVALUACIÓN DE CONSULTAS
 
-1. Saludos iniciales:
-   - Si el usuario solo saluda (ej. "Hola", "Buenos días", "Buenas"), responde con calidez, preséntate brevemente y pregúntale su nombre y en qué lo podés ayudar hoy.
-   - Adapta el saludo según el momento de forma natural (ej. "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano?").
+1. Diagnóstico previo a cualquier respuesta técnica:
+   - Evaluá con atención qué está consultando el usuario.
+   - Si la consulta es simple a nivel usuario (uso básico, armado/desarmado, consulta general sobre apps), podés responder con una guía breve preguntando marca o modelo.
+   - Si el procedimiento conlleva riesgo de desconfiguración, bloqueo del panel, manipulación eléctrica, cambios complejos de clave/zonas, o si el cliente duda de los pasos: aconsejá claramente que lo realice un técnico especializado para resguardar la seguridad del sistema y ofrecé coordinar la visita técnica al 2241-527180.
 
-2. Nuevas instalaciones, cotizaciones y presupuestos:
-   - Los presupuestos son 100% SIN CARGO.
-   - NUNCA lo consideres una emergencia ni pases números de guardia técnica.
-   - Conversa sobre lo que necesita (casa, quinta, local, cantidad de ambientes, si cuenta con internet).
-   - Guíalo amablemente a completar el formulario para que un técnico analice su caso puntual y lo contacte:
+2. Límites estrictos de configuración:
+   - Programación de Instalador (PROHIBIDA): NUNCA brindes claves maestras de instalador, códigos de ingeniería ni acceso a la placa principal.
+   - Explicá con cordialidad que esos parámetros son exclusivos del servicio técnico homologado por normativas de seguridad.
+
+3. Nuevas Instalaciones y Cotizaciones:
+   - Aplica ÚNICAMENTE cuando la persona quiere colocar un sistema nuevo o consultar por equipamiento para su propiedad.
+   - Conversá primero sobre el lugar (ambientes, si es vivienda o comercio).
+   - Enviá el enlace del formulario SOLO en este contexto para que un técnico evalúe la propiedad y coordine la propuesta sin cargo:
      🔗 https://forms.gle/xpRAs7XkrZUertkn8
 
-3. Consultas técnicas críticas / Urgencias:
-   - Aplica EXCLUSIVAMENTE si hay un problema grave con una alarma existente (sirena sonando sin control, corte total o avería urgente).
-   - Facilita los contactos de guardia: 2241-527180 (Principal) o 2241-527357.
+4. Urgencias Reales:
+   - Si el sistema está disparado sin control o hay una rotura crítica, derivá de inmediato a las líneas de guardia: 2241-527180 (Principal) / 2241-527357.
 
-4. Medios de pago:
-   - Comenta de forma amena que disponemos de facilidades y cuotas con tarjeta, y que el técnico le detalla las opciones exactas al momento del presupuesto.
-
-5. Cierres y despedidas:
-   - Cuando el usuario agradezca o se despida, responde cordialmente deseándole un buen día y quedando a disposición para cuando lo necesite.
+5. Saludos, Formas de Pago y Cierres:
+   - Saludos: respondé con calidez y consultá en qué podés orientarlo.
+   - Pagos: informá que se aceptan cuotas con tarjeta y que el técnico define el plan con el presupuesto.
+   - Despedidas: cerrá de manera formal y cordial sin incluir enlaces.
 
 ---
 
 ### DERIVACIÓN HUMANA:
 Debes incluir la etiqueta exacta [DERIVAR_HUMANO] al final de tu mensaje en cualquiera de estos casos:
 - El cliente reporta una urgencia técnica crítica (alarma sonando sin parar, rotura grave).
-- El cliente solicita explícitamente hablar por teléfono o ser llamado por un asesor humano.
-- El cliente confirma que ya completó el formulario de relevamiento.
+- El cliente solicita coordinar una visita técnica o hablar con un asesor/técnico.
+- El cliente confirma que completó el formulario de relevamiento.
 """
 
 model = None
@@ -66,7 +68,7 @@ if is_gemini_configured():
         model = genai.GenerativeModel(
             model_name="gemini-3.6-flash",
             system_instruction=SYSTEM_PROMPT,
-            generation_config={"temperature": 0.3}
+            generation_config={"temperature": 0.25}
         )
     except Exception as e:
         print(f"[WARN] Error inicializando modelo Gemini: {e}")
@@ -79,31 +81,38 @@ def _simulate_smart_ai_reply(user_message: str) -> Tuple[str, bool]:
 
     if any(k in lower for k in ["sonando", "urgente", "emergencia", "rotura", "caido", "caído", "disparada"]):
         reply = (
-            "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o 2241-527357."
+            "Para asistirte de inmediato con la urgencia técnica, por favor comunicate con nuestra guardia al 2241-527180 o al 2241-527357."
         )
         return reply, True
 
-    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos", "perfecto"]):
+    if any(k in lower for k in ["codigo", "código", "instalador", "ingenieria", "placa", "programacion"]):
         reply = (
-            "¡Muchas gracias a vos! Que tengas un excelente día y quedamos a disposición en Alarmas Chascomús para lo que necesites."
+            "Por normas estrictas de seguridad de los sistemas, los códigos de instalador y la programación de placa son de acceso exclusivo del servicio técnico homologado. "
+            "Podemos coordinar una visita técnica con un especialista al 2241-527180."
+        )
+        return reply, False
+
+    if any(k in lower for k in ["gracias", "chau", "hasta luego", "nos vemos"]):
+        reply = (
+            "¡Muchas gracias a vos! Quedamos a disposición en Alarmas Chascomús para cuando lo necesites. ¡Que tengas un excelente día!"
         )
         return reply, False
 
     if any(k in lower for k in ["hola", "buen dia", "buenas", "buenas tardes", "buen día"]):
         reply = (
-            "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿con quién tengo el gusto y en qué te puedo dar una mano hoy?"
+            "¡Hola! Buen día. Soy el asistente de Alarmas Chascomús, ¿en qué te podemos orientar hoy?"
         )
         return reply, False
 
     reply = (
-        "¡Con gusto te asesoramos! Recordá que todos nuestros presupuestos son 100% sin cargo. "
-        "Para que un técnico evalúe tu necesidad puntual y te arme la propuesta, por favor completá este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8"
+        "¡Con gusto te asesoramos! Recordá que las evaluaciones son 100% sin cargo. "
+        "Para que un técnico analice tu propiedad y coordine la propuesta a medida, podés completar este breve formulario: https://forms.gle/xpRAs7XkrZUertkn8"
     )
     return reply, False
 
 def generate_ai_response(phone: str, user_message: str) -> Tuple[str, bool]:
     """
-    Genera la respuesta con Gemini teniendo en cuenta la conversación natural, cálida y profesional.
+    Genera la respuesta con Gemini aplicando el criterio técnico y diagnóstico contextual.
     Devuelve (texto_limpio, debe_derivar_a_guardia).
     """
     if not is_gemini_configured() or model is None:
