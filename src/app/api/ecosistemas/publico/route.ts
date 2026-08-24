@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
-    const ecoId = searchParams.get("ecosistemaId");
+    const ecoId = searchParams.get("ecosistemaId") || searchParams.get("ecoId");
 
     let ecosistema: any = null;
     let miembroActivo: any = null;

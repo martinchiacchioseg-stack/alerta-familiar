@@ -112,6 +112,19 @@ export function EmergencyTrigger({ user, token }: EmergencyTriggerProps) {
     }
 
     try {
+      const effectiveToken = token || (typeof window !== "undefined" ? localStorage.getItem("alerta_token") : null);
+
+      if (!effectiveToken && !user) {
+        setFeedbackMessage({
+          type: "ERROR",
+          text: "⚠️ Dispositivo no vinculado",
+          details: "Para enviar alertas, primero vinculá este celular ingresando el código de tu grupo o abriendo tu enlace de invitación.",
+        });
+        setIsSending(false);
+        setActiveAlert(null);
+        return;
+      }
+
       // Captura de GPS concurrente con el envío
       const loc = await getQuickLocation();
       const bateria = await getBatteryLevel();
@@ -124,7 +137,7 @@ export function EmergencyTrigger({ user, token }: EmergencyTriggerProps) {
           latitud: loc.lat,
           longitud: loc.lng,
           precisionGps: loc.accuracy,
-          memberToken: token,
+          memberToken: effectiveToken || undefined,
           metadata: {
             bateria,
             userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,

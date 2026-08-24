@@ -36,6 +36,14 @@ export default function HomePage() {
       const data = await res.json();
 
       let activeToken = localStorage.getItem("alerta_token");
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get("token");
+        if (urlToken) {
+          activeToken = urlToken;
+          localStorage.setItem("alerta_token", urlToken);
+        }
+      }
 
       if (data.authenticated && data.user) {
         setCurrentUser(data.user);
