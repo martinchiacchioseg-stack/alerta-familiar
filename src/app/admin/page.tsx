@@ -201,6 +201,55 @@ export default function SuperAdminPage() {
       eco.usuarios?.some((u: any) => u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || u.email?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  if (!loading && currentUser?.rol !== "SUPERADMIN") {
+    return (
+      <div className="min-h-screen flex flex-col justify-between bg-slate-950 text-white">
+        <Navbar user={currentUser} />
+
+        <main className="flex-1 max-w-md w-full mx-auto px-4 py-12 flex flex-col items-center justify-center text-center">
+          <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto">
+              <Lock className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-bold text-white">Consola Restringida</h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Actualmente tu navegador tiene abierta la sesión de tu grupo familiar (<b>{currentUser?.nombre || "Miembro"}</b>).
+              </p>
+            </div>
+
+            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 text-xs text-slate-300 text-left space-y-1">
+              <span className="font-semibold text-slate-200 block">¿Querés gestionar tus integrantes?</span>
+              <p>Podés hacerlo directamente desde el <b>Panel de tu Familia</b> sin necesidad de salir.</p>
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <a
+                href="/panel"
+                className="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-950/50 flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Users className="w-4 h-4" />
+                <span>Ir al Panel de mi Familia</span>
+              </a>
+
+              <button
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  localStorage.removeItem("alerta_token");
+                  window.location.href = "/login";
+                }}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition-all"
+              >
+                Cerrar sesión y entrar como SuperAdmin
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-950 text-white">
       <Navbar user={currentUser} />
