@@ -24,8 +24,8 @@ export async function sendTelegramMessage(
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   const token = getBotToken();
   if (!token || token === "demo_token_for_development") {
-    console.log(`[TELEGRAM MOCK] Message to ${chatId}: ${text}`);
-    return { success: true, data: { mock: true, chatId, text } };
+    console.error(`[TELEGRAM ERROR] TELEGRAM_BOT_TOKEN no configurado. Destino: ${chatId}`);
+    return { success: false, error: "TELEGRAM_BOT_TOKEN no configurado en el servidor" };
   }
 
   try {
