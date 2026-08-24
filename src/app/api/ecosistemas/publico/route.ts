@@ -83,6 +83,7 @@ export async function GET(req: NextRequest) {
       miembroActivo,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: "Error al consultar ecosistema" }, { status: 500 });
+    console.error("Error en endpoint publico:", error);
+    return NextResponse.json({ error: "Error al consultar ecosistema", details: error?.message }, { status: 500 });
   }
 }
