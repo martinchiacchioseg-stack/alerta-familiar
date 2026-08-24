@@ -27,6 +27,17 @@ export default function SuperAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Estados para gestionar miembros de un ecosistema específico desde SuperAdmin
+  const [selectedEcoForMembers, setSelectedEcoForMembers] = useState<any>(null);
+  const [ecoMembers, setEcoMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberPhone, setNewMemberPhone] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState<"MIEMBRO" | "ADMIN_ECOSISTEMA">("MIEMBRO");
+  const [creatingMember, setCreatingMember] = useState(false);
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
+
   // Form states for new ecosystem
   const [nombreEco, setNombreEco] = useState("");
   const [tipoEco, setTipoEco] = useState<"FAMILIA" | "COMERCIO">("FAMILIA");
@@ -119,6 +130,66 @@ export default function SuperAdminPage() {
       }
     } catch (e) {
       alert("Error al actualizar estado");
+    }
+  const openMembersModal = async (eco: any) => {
+    setSelectedEcoForMembers(eco);
+    setLoadingMembers(true);
+    try {
+      const res = await fetch(`/api/miembros?ecosistemaId=${eco.id}`);
+      const data = await res.json();
+      if (data.success) {
+        setEcoMembers(data.miembros);
+      }
+    } catch (e) {
+      console.error("Error al cargar miembros del ecosistema:", e);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  const handleAddMemberToEco = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEcoForMembers) return;
+    setCreatingMember(true);
+    try {
+      const res = await fetch("/api/miembros", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ecosistemaId: selectedEcoForMembers.id,
+          nombre: newMemberName,
+          telefono: newMemberPhone,
+          rol: newMemberRole,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewMemberName("");
+        setNewMemberPhone("");
+        setShowAddMemberModal(false);
+        await openMembersModal(selectedEcoForMembers);
+        await loadData();
+      } else {
+        alert(data.error || "Error al agregar integrante");
+      }
+    } catch (err) {
+      alert("Error al comunicar con el servidor");
+    } finally {
+      setCreatingMember(false);
+    }
+  };
+
+  const handleDeleteMemberFromEco = async (id: string, nombre: string) => {
+    if (!confirm(`¿Eliminar al integrante "${nombre}" del ecosistema?`)) return;
+    try {
+      const res = await fetch(`/api/miembros?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setEcoMembers(ecoMembers.filter((m) => m.id !== id));
+        await loadData();
+      }
+    } catch (e) {
+      alert("Error al eliminar integrante");
     }
   };
 
@@ -283,17 +354,28 @@ export default function SuperAdminPage() {
                           </span>
                         </td>
                         <td className="py-3.5 text-right">
-                          <button
-                            onClick={() => handleToggleState(eco.id, eco.estado)}
-                            className={`p-1.5 rounded-lg border text-xs transition-colors ${
-                              eco.estado === "ACTIVO"
-                                ? "border-red-500/30 text-red-400 hover:bg-red-950"
-                                : "border-emerald-500/30 text-emerald-400 hover:bg-emerald-950"
-                            }`}
-                            title={eco.estado === "ACTIVO" ? "Suspender Ecosistema" : "Reactivar"}
-                          >
-                            <Power className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => openMembersModal(eco)}
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                              title="Gestionar Integrantes"
+                            >
+                              <Users className="w-3.5 h-3.5 text-blue-400" />
+                              <span>Integrantes</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleToggleState(eco.id, eco.estado)}
+                              className={`p-1.5 rounded-lg border text-xs transition-colors ${
+                                eco.estado === "ACTIVO"
+                                  ? "border-red-500/30 text-red-400 hover:bg-red-950"
+                                  : "border-emerald-500/30 text-emerald-400 hover:bg-emerald-950"
+                              }`}
+                              title={eco.estado === "ACTIVO" ? "Suspender Ecosistema" : "Reactivar"}
+                            >
+                              <Power className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -435,6 +517,191 @@ export default function SuperAdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal de Gestión de Miembros del Ecosistema */}
+      {selectedEcoForMembers && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-red-400 tracking-wider block">
+                  Gestión de Integrantes
+                </span>
+                <h3 className="text-lg font-bold text-white">
+                  {selectedEcoForMembers.nombre}
+                </h3>
+              </div>
+
+              <button
+                onClick={() => setSelectedEcoForMembers(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-xs"
+              >
+                ✕ Cerrar
+              </button>
+            </div>
+
+            {/* Lista de Miembros */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-300">
+                  Integrantes Registrados ({ecoMembers.length})
+                </span>
+
+                <button
+                  onClick={() => setShowAddMemberModal(true)}
+                  className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-red-950/40"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Agregar Integrante</span>
+                </button>
+              </div>
+
+              {loadingMembers ? (
+                <div className="py-6 flex justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-red-500" />
+                </div>
+              ) : ecoMembers.length === 0 ? (
+                <div className="py-6 text-center text-xs text-slate-500 bg-slate-950 rounded-2xl border border-slate-800">
+                  No hay integrantes en este ecosistema.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {ecoMembers.map((m) => {
+                    const inviteUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/unirse?token=${m.tokenVinculacion}`;
+                    return (
+                      <div
+                        key={m.id}
+                        className="bg-slate-950 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">{m.nombre}</span>
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                m.rol === "ADMIN_ECOSISTEMA"
+                                  ? "bg-red-950/80 text-red-300 border border-red-500/30"
+                                  : "bg-slate-800 text-slate-300"
+                              }`}
+                            >
+                              {m.rol === "ADMIN_ECOSISTEMA" ? "TITULAR" : "MIEMBRO"}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                            {m.email && <span>📧 {m.email}</span>}
+                            {m.telefono && <span>📞 {m.telefono}</span>}
+                            <span>
+                              {m.telegramChatId ? (
+                                <span className="text-emerald-400 font-medium flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  <span>Telegram Conectado (@{m.telegramUsername || "Chat"})</span>
+                                </span>
+                              ) : (
+                                <span className="text-amber-400 font-medium">
+                                  ⏳ Telegram No Vinculado
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {/* Botón para copiar enlace de unirse */}
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(inviteUrl);
+                              setCopiedToken(m.tokenVinculacion);
+                              setTimeout(() => setCopiedToken(null), 2500);
+                            }}
+                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors border border-slate-700"
+                            title="Copiar enlace de invitación para este celular"
+                          >
+                            <span>{copiedToken === m.tokenVinculacion ? "✅ ¡Copiado!" : "📋 Copiar Enlace"}</span>
+                          </button>
+
+                          {/* Botón eliminar */}
+                          <button
+                            onClick={() => handleDeleteMemberFromEco(m.id, m.nombre)}
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-950/60 rounded-lg border border-red-500/30 transition-colors"
+                            title="Eliminar este integrante"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Anidado para Crear Nuevo Integrante */}
+            {showAddMemberModal && (
+              <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 mt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">
+                    Nuevo Integrante para {selectedEcoForMembers.nombre}
+                  </span>
+                  <button
+                    onClick={() => setShowAddMemberModal(false)}
+                    className="text-xs text-slate-400 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddMemberToEco} className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                        Nombre Completo *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ej: Lucas / Mamá / Abuelo"
+                        value={newMemberName}
+                        onChange={(e) => setNewMemberName(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                        Teléfono Móvil (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: +54 9 2241 123456"
+                        value={newMemberPhone}
+                        onChange={(e) => setNewMemberPhone(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddMemberModal(false)}
+                      className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={creatingMember}
+                      className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5"
+                    >
+                      {creatingMember && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>Guardar Integrante</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       )}
