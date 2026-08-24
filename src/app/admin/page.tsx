@@ -131,6 +131,8 @@ export default function SuperAdminPage() {
     } catch (e) {
       alert("Error al actualizar estado");
     }
+  };
+
   const openMembersModal = async (eco: any) => {
     setSelectedEcoForMembers(eco);
     setLoadingMembers(true);
