@@ -1,0 +1,118 @@
+// Prisma Schema para Alarmas Chascomús - Alerta Familiar
+// Arquitectura Multi-Tenant de Seguridad y Alta Disponibilidad
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum TipoEcosistema {
+  FAMILIA
+  COMERCIO
+}
+
+enum EstadoEcosistema {
+  ACTIVO
+  SUSPENDIDO
+}
+
+enum RolUsuario {
+  SUPERADMIN
+  ADMIN_ECOSISTEMA
+  MIEMBRO
+}
+
+enum TipoAlerta {
+  LLEGADA_OK
+  SOS_PANICO
+}
+
+enum EstadoDespacho {
+  ENVIADO
+  ERROR_PARCIAL
+  FALLIDO
+  MODO_LOCAL
+}
+
+model Ecosistema {
+  id               String           @id @default(uuid())
+  nombre           String
+  tipo             TipoEcosistema   @default(FAMILIA)
+  estado           EstadoEcosistema @default(ACTIVO)
+  direccion        String?
+  telefonoContacto String?
+  notas            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  usuarios Usuario[]
+  alertas  Alerta[]
+
+  @@index([estado])
+}
+
+model Usuario {
+  id               String       @id @default(uuid())
+  ecosistemaId     String?
+  ecosistema       Ecosistema?  @relation(fields: [ecosistemaId], references: [id], onDelete: Cascade)
+  nombre           String
+  email            String?      @unique
+  telefono         String?
+  passwordHash     String?
+  rol              RolUsuario   @default(MIEMBRO)
+  telegramChatId   String?      @unique
+  telegramUsername String?
+  tokenVinculacion String       @unique @default(uuid())
+  vinculadoEn      DateTime?
+  activo           Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  alertas    Alerta[]
+  auditorias SuperAdminAudit[]
+
+  @@index([ecosistemaId])
+  @@index([tokenVinculacion])
+  @@index([telegramChatId])
+}
+
+model Alerta {
+  id                 String         @id @default(uuid())
+  ecosistemaId       String
+  ecosistema         Ecosistema     @relation(fields: [ecosistemaId], references: [id], onDelete: Cascade)
+  usuarioId          String
+  usuario            Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo               TipoAlerta
+  latitud            Float?
+  longitud           Float?
+  precisionGps       Float?
+  direccionAprox     String?
+  estadoDespacho     EstadoDespacho @default(ENVIADO)
+  destinatariosTotal Int            @default(0)
+  destinatariosExito Int            @default(0)
+  metadataJson       String?
+  createdAt          DateTime       @default(now())
+
+  @@index([ecosistemaId, createdAt])
+  @@index([usuarioId])
+}
+
+model SuperAdminAudit {
+  id           String   @id @default(uuid())
+  usuarioId    String?
+  usuario      Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  accion       String
+  targetTipo   String?
+  targetId     String?
+  detallesJson String?
+  ip           String?
+  createdAt    DateTime @default(now())
+
+  @@index([accion])
+  @@index([createdAt])
+}

@@ -1,21 +1,48 @@
-# Variables de entorno con claves secretas
+# Dependencias
+node_modules/
+npm-debug.log*
+
+# Next.js
+.next/
+out/
+dist/
+
+# Variables de entorno - NUNCA subir al repositorio
 .env
+.env.local
+.env.*.local
 
-# Base de datos local
-alarmas_chats.db
+# Prisma (engines se regeneran con prisma generate)
+prisma/migrations/
 
-# Entornos virtuales y caché de Python
+# Python (archivos del proyecto anterior)
 __pycache__/
 *.pyc
 *.pyo
-venv/
-.venv/
-env/
+*.db
+*.sqlite
 
-# Node modules y dist
-node_modules/
-dist/
-
-# Binarios y temporales
+# Archivos del proyecto anterior que no corresponden
+ai_service.py
+database.py
+main.py
+meta_service.py
+registrar_numero.py
+simular_chat.py
+requirements.txt
+Procfile
+vite.config.js
+index.html
 cloudflared.exe
+Respaldo_Completo_Bot_Alarmas_Chascomus_2026.zip
+INFORME_OFICIAL_CONFIGURACION_Y_GUARDRAILS.md
+bot-alarmas-chascomus/
+
+# Logs y temporales
 *.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
