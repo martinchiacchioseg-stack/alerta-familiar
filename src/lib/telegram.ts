@@ -1,7 +1,12 @@
 import prisma from "./prisma";
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
-const TELEGRAM_API_BASE = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
+function getBotToken(): string {
+  return process.env.TELEGRAM_BOT_TOKEN || "";
+}
+
+function getApiBase(): string {
+  return `https://api.telegram.org/bot${getBotToken()}`;
+}
 
 interface SendMessageOptions {
   parseMode?: "HTML" | "MarkdownV2" | "Markdown";
@@ -17,13 +22,14 @@ export async function sendTelegramMessage(
   text: string,
   options: SendMessageOptions = {}
 ): Promise<{ success: boolean; data?: any; error?: string }> {
-  if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "demo_token_for_development") {
+  const token = getBotToken();
+  if (!token || token === "demo_token_for_development") {
     console.log(`[TELEGRAM MOCK] Message to ${chatId}: ${text}`);
     return { success: true, data: { mock: true, chatId, text } };
   }
 
   try {
-    const res = await fetch(`${TELEGRAM_API_BASE}/sendMessage`, {
+    const res = await fetch(`${getApiBase()}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -54,13 +60,14 @@ export async function sendTelegramLocation(
   longitude: number,
   options: { disableNotification?: boolean } = {}
 ): Promise<{ success: boolean; data?: any; error?: string }> {
-  if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "demo_token_for_development") {
+  const token = getBotToken();
+  if (!token || token === "demo_token_for_development") {
     console.log(`[TELEGRAM MOCK] Location to ${chatId}: [${latitude}, ${longitude}]`);
     return { success: true, data: { mock: true, chatId, latitude, longitude } };
   }
 
   try {
-    const res = await fetch(`${TELEGRAM_API_BASE}/sendLocation`, {
+    const res = await fetch(`${getApiBase()}/sendLocation`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
