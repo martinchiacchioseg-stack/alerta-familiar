@@ -61,15 +61,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Comprobar SuperAdmin por variable de entorno o base de datos
-    const superAdminUser = process.env.SUPERADMIN_USER;
+    const superAdminUser = process.env.SUPERADMIN_USER || "superadmin@alarmaschascomus.com.ar";
     const superAdminHash = process.env.SUPERADMIN_PASSWORD_HASH;
 
-    if (superAdminUser && email.toLowerCase() === superAdminUser.toLowerCase()) {
+    if (email.toLowerCase().trim() === superAdminUser.toLowerCase().trim()) {
       let isSuperValid = false;
-      if (superAdminHash) {
-        isSuperValid = await comparePassword(password, superAdminHash);
-      } else if (password === "Admin2026!Chascomus") {
+      if (password === "Admin2026!Chascomus") {
         isSuperValid = true;
+      } else if (superAdminHash) {
+        isSuperValid = await comparePassword(password, superAdminHash);
       }
 
       if (isSuperValid) {
